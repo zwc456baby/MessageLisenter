@@ -1,0 +1,51 @@
+import com.android.builder.model.SigningConfig
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.zhou.example.messagelisenterservice"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        assembleRelease {
+            storeFile file('Apk_jks.jks')//签名文件路径，
+            //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
+            storePassword 'xxx' //密码
+            keyAlias 'xxx'
+            keyPassword 'xxx'  //密码
+        }
+        debugConfig {
+            storeFile file('Apk_jks.jks')//签名文件路径，
+            //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
+            storePassword 'xxx' //密码
+            keyAlias 'xxx'
+            keyPassword 'xxx'  //密码
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.assembleRelease // 配置release包的签名
+        }
+        debug {
+            signingConfig signingConfigs.debugConfig // 配置debug包的签名
+        }
+    }
+
+}
+
+dependencies {
+//    implementation fileTree(dir: 'libs', include: ['*.jar'])
+//    implementation 'com.android.support:appcompat-v7:26.1.0'
+//    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+//    testImplementation 'junit:junit:4.12'
+}

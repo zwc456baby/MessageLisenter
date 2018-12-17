@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Monitor</string>
+    <string name="service_name">消息监听服务</string>
+</resources>
