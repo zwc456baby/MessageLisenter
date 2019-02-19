@@ -263,16 +263,19 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void startPlaySound(StatusBarNotification sbn) {
         addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
         if (!handler.hasMessages(looperWhat))
-            startLooper(0);
+            startLooper(0, battery);
         startLockActivity();
     }
 
-    private void startLooper(long delay) {
+    private void startLooper(long delay, int battery) {
+        Message msg = handler.obtainMessage(looperWhat, battery);
         if (delay > 0) {
-            handler.sendEmptyMessageDelayed(looperWhat, delay);
+            handler.sendMessageDelayed(msg, delay);
             if (pm != null)
                 pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "messagelisenter:wakelock").acquire(Math.round(sleepTime * 1.5));
-        } else handler.sendEmptyMessage(looperWhat);
+        } else {
+            handler.sendMessage(msg);
+        }
     }
 
     private void startLockActivity() {
@@ -462,12 +465,14 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     @Override
     public boolean handleMessage(Message msg) {
 //        if (!hasMessage()) return true;
-        if (!playMusic && !zhenDong || !(battery > 15)) {
+        int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
+        if (!playMusic && !zhenDong || !(battery > 15)
+                || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
             finishLockActivity();
             return true;
         }
 
-        startLooper(sleepTime);
+        startLooper(sleepTime, startBattery);
 
         if (playMusic) playNotifySound(rt);
         if (zhenDong) zhengDong(vibrator);
@@ -503,9 +508,14 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     Toast.makeText(context, "消息监听服务运行中", Toast.LENGTH_SHORT).show();
                 }
             } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-                battery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
+                int tmpBattery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
+                if (tmpBattery <= battery) {
+                    battery = tmpBattery;
+                    return; //电量在减少，不做任何操作
+                }
+                battery = tmpBattery;
                 if (hasMessage(ntfMsgList) && battery > 20 && !handler.hasMessages(looperWhat)) {
-                    startLooper(0);
+                    startLooper(0, battery);
                     startLockActivity();
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
