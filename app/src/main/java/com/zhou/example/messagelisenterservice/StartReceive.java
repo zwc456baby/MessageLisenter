@@ -45,20 +45,8 @@ public class StartReceive extends BroadcastReceiver {
                 e.printStackTrace();
             }
 
-            PreUtils.put(context, Constant.APP_PACKAGE_KEY,
-                    appPackage);
-            PreUtils.put(context, Constant.TITLE_FILTER_KEY,
-                    titleFilter);
-            PreUtils.put(context, Constant.MESSAGE_FILTER_KEY,
-                    messageFilter);
-            PreUtils.put(context, Constant.PLAY_MUSIC_KEY,
-                    playMusic);
-            PreUtils.put(context, Constant.PLAY_ZHENGDONG_KEY,
-                    zhengDong);
-            PreUtils.put(context, Constant.CANCEL_ABLE_KEY,
-                    cancelable);
-
-            PreUtils.put(context, Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
+            MessageLisenter.putConfigToXml(context, appPackage, titleFilter, messageFilter,
+                    playMusic, zhengDong, cancelable, sleepTime);
 
             String configFilePath = MessageLisenter.getConfigFilePath(context);
             File configFile = configFilePath == null ? null : new File(configFilePath);

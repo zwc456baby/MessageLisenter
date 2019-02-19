@@ -67,6 +67,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final Handler handler = new Handler(this);
     private final int looperWhat = 0;
 
+    private boolean startLockActivity = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -121,10 +123,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void checkAllNotify(StatusBarNotification[] notifications) {
-        ArrayList<StatusBarNotification> existMsg;
-        if ((existMsg = getMessageExists(notifications)) != null)
-            for (StatusBarNotification sbn : existMsg)
-                startPlaySound(sbn);
+        for (StatusBarNotification sbn : notifications)
+            tryStartPlaySound(sbn);
     }
 
     protected static String getConfigFilePath(Context context) {
@@ -174,6 +174,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             cancelable = rootJson.optBoolean(Constant.CANCEL_ABLE_KEY, true);
             sleepTime = rootJson.optLong(Constant.PLAY_SLEEP_TIME_KEY, 4000L);
             if (sleepTime < 500) sleepTime = 500;
+
+            putConfigToXml(this, packageFilter, titleFilter, msgFilter,
+                    playMusic, zhenDong, cancelable, sleepTime);
         }
     }
 
@@ -188,21 +191,28 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         if (sleepTime < 500) sleepTime = 500;
     }
 
+    public static void putConfigToXml(Context context, String appPackage, String titleFilter, String messageFilter,
+                                      boolean playMusic, boolean zhengDong, boolean cancelable, long sleepTime) {
+        PreUtils.put(context, Constant.APP_PACKAGE_KEY,
+                appPackage);
+        PreUtils.put(context, Constant.TITLE_FILTER_KEY,
+                titleFilter);
+        PreUtils.put(context, Constant.MESSAGE_FILTER_KEY,
+                messageFilter);
+        PreUtils.put(context, Constant.PLAY_MUSIC_KEY,
+                playMusic);
+        PreUtils.put(context, Constant.PLAY_ZHENGDONG_KEY,
+                zhengDong);
+        PreUtils.put(context, Constant.CANCEL_ABLE_KEY,
+                cancelable);
+
+        PreUtils.put(context, Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
+    }
+
     private void clearNfSbnAndStopSound() {
         ntfMsgList.clear();
         tmpNullMsgList.clear();
         if (handler.hasMessages(looperWhat)) stopPlaySound();
-    }
-
-    private ArrayList<StatusBarNotification> getMessageExists(StatusBarNotification[] sbns) {
-        ArrayList<StatusBarNotification> existMsg = null;
-        for (StatusBarNotification sbn : sbns)
-            if (isSettingMessage(sbn)) {
-                if (existMsg == null)
-                    existMsg = new ArrayList<>();
-                existMsg.add(sbn);
-            }
-        return existMsg;
     }
 
     private boolean isNtfMessage(MessageEnty enty, String packageName, int Id) {
@@ -240,8 +250,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             } else if (!TextUtils.isEmpty(subText))
                 notificationText = subText.toString();
             else return false;
-            if (!notificationText.contains(msgFilter))
-                return false;
+            return notificationText.contains(msgFilter);
         }
         return true;
     }
@@ -255,14 +264,38 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
         if (!handler.hasMessages(looperWhat))
             startLooper(0);
+        startLockActivity();
     }
 
     private void startLooper(long delay) {
         if (delay > 0) {
             handler.sendEmptyMessageDelayed(looperWhat, delay);
             if (pm != null)
-                pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wakelock").acquire(Math.round(sleepTime * 1.5));
+                pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "messagelisenter:wakelock").acquire(Math.round(sleepTime * 1.5));
         } else handler.sendEmptyMessage(looperWhat);
+    }
+
+    private void startLockActivity() {
+        if (startLockActivity) {
+            Intent intent = new Intent(this, LockShowActivity.class);
+            intent.putExtra(Constant.GET_MESSAGE_LENGTH, ntfMsgList.size());
+
+            startActivity(intent);
+        } else
+            updataMessageData();
+    }
+
+    private void finishLockActivity() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Constant.FINISH_LOCK_SHOW_ACTIVITY);
+        sendBroadcast(sendIntent);
+    }
+
+    private void updataMessageData() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Constant.UPDATA_MESSAGE_DATA_ACTION);
+        sendIntent.putExtra(Constant.GET_MESSAGE_LENGTH, ntfMsgList.size());
+        sendBroadcast(sendIntent);
     }
 
     private void tryStopPlaysound(StatusBarNotification sbns) {
@@ -275,13 +308,15 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void stopPlaySound() {
+        finishLockActivity();
+
         handler.removeMessages(looperWhat);
         stopNotify(rt, vibrator);
     }
 
     /*
-    * 播放一次系统提示音
-    * */
+     * 播放一次系统提示音
+     * */
     private void playNotifySound(Ringtone rt) {
         rt.play();
     }
@@ -292,8 +327,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     /*
-    * 震动
-    * */
+     * 震动
+     * */
     private void zhengDong(Vibrator vibrator) {
         long vbtime = sleepTime / 4;
         if (vbtime > 1000) vbtime = 1000;
@@ -315,6 +350,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void registerHomeBroad() {
         IntentFilter filter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -425,7 +462,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     @Override
     public boolean handleMessage(Message msg) {
 //        if (!hasMessage()) return true;
-        if (!playMusic && !zhenDong || !(battery > 15)) return true;
+        if (!playMusic && !zhenDong || !(battery > 15)) {
+            finishLockActivity();
+            return true;
+        }
 
         startLooper(sleepTime);
 
@@ -464,8 +504,17 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
             } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
                 battery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
-                if (hasMessage(ntfMsgList) && battery > 20 && !handler.hasMessages(looperWhat))
+                if (hasMessage(ntfMsgList) && battery > 20 && !handler.hasMessages(looperWhat)) {
                     startLooper(0);
+                    startLockActivity();
+                }
+            } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+                startLockActivity = true;
+            } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                startLockActivity = false;
+            } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+                startLockActivity = false;
+                finishLockActivity();
             }
         }
     };

@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Monitor</string>
     <string name="service_name">消息监听服务</string>
+
+    <string name="show_message_count">你有来自 %s 的 %d 条消息需要查看</string>
+    <string name="filter_text">关键字 %s</string>
+    <string name="close">关闭</string>
 </resources>

@@ -14,10 +14,16 @@ public class Constant {
     public final static String KILL_SERVICE_TAG_KEY = "kill_service_tag_key";
     public final static String CANCEL_ABLE_KEY = "cancel_able_key";
 
+    public final static String GET_MESSAGE_LENGTH = "get_message_length";
+
+    public final static String FINISH_LOCK_SHOW_ACTIVITY ="finish_lock_show_activity";
+    public final static String UPDATA_MESSAGE_DATA_ACTION="updata_message_data_action";
+
     public static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
 
-//    启动远程服务的广播事件
+    //    启动远程服务的广播事件
     public static final String REMOTE_SERVICE_START_ACTION = "com.zhou.example.messagelisenterservice.START_SERVICE";
 
     public final static int KILL_SERVICE_TAG = 1;
+
 }
