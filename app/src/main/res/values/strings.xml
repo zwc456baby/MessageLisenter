@@ -7,7 +7,6 @@
     <string name="close">关闭</string>
 
     <string name="input_app_name">请输入应用包名</string>
-    <string name="wx_app_name">com.tencent.mm</string>
     <string name="input_title_filter">请输入消息头</string>
     <string name="input_message_filter">请输入消息内容</string>
     <string name="play_sleep_time">提示间隔时间</string>

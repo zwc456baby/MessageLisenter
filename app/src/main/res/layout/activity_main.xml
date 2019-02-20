@@ -38,7 +38,6 @@
                 android:gravity="center"
                 android:hint="@string/input_app_name"
                 android:inputType="text"
-                android:text="@string/wx_app_name"
                 android:textColor="#000"
                 android:textSize="18sp" />
 
