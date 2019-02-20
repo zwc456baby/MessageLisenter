@@ -431,7 +431,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     return; //电量在减少，不做任何操作
                 }
                 battery = tmpBattery;
-                if (hasMessage(ntfMsgList) && battery > 20 && !handler.hasMessages(looperWhat)) {
+                if (hasMessage(ntfMsgList) && battery > 20
+                        && !handler.hasMessages(looperWhat) && !pauseNotify) {
                     startLooper(0, battery);
                     startLockActivity();
                 }
