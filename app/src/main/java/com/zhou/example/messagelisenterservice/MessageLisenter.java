@@ -21,9 +21,6 @@ import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,19 +40,13 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 
-    private final String dayType = "yyyy-MM-dd-HH:mm:ss";
+    private final String dayType = "yyyy-MM-dd HH:mm:ss";
     private final DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
     private final ArrayList<MessageEnty> ntfMsgList = new ArrayList<>();
     // 暂存一下空的消息的包名和id
     private final ArrayList<MessageEnty> tmpNullMsgList = new ArrayList<>();
     //    配置相关
-    private String packageFilter;
-    private String titleFilter;
-    private String msgFilter;
-    private boolean playMusic;
-    private boolean zhenDong;
-    private boolean cancelable;
-    private long sleepTime;
+    private ConfigEntry config;
 
     //震动和唤醒
     private int battery = 100;
@@ -127,86 +118,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             tryStartPlaySound(sbn);
     }
 
-    protected static String getConfigFilePath(Context context) {
-        String configName = "config.json";
-        File dataRootFile = context.getExternalFilesDir("config");
-        return dataRootFile == null ? null : dataRootFile.getAbsolutePath() + File.separator + configName;
-    }
-
     private void reloadConfig() {
-        String configFilePath = getConfigFilePath(this);
-        FileUtils fileUtils = new FileUtils();
-        File configFile = configFilePath == null ? null : new File(configFilePath);
-        if (configFilePath == null || !configFile.exists() || configFile.length() == 0) {
-            loadConfigFroXml();
-            if (configFilePath == null) return;
-            try {
-                JSONObject rootJson = new JSONObject();
-                rootJson.put(Constant.APP_PACKAGE_KEY, packageFilter);
-                rootJson.put(Constant.TITLE_FILTER_KEY, titleFilter);
-                rootJson.put(Constant.MESSAGE_FILTER_KEY, msgFilter);
-                rootJson.put(Constant.PLAY_MUSIC_KEY, playMusic);
-                rootJson.put(Constant.PLAY_ZHENGDONG_KEY, zhenDong);
-                rootJson.put(Constant.CANCEL_ABLE_KEY, cancelable);
-                rootJson.put(Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
-
-                fileUtils.putStringToFile(configFilePath, rootJson.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } else {
-            JSONObject rootJson = null;
-            try {
-                String fileStr = fileUtils.readFileToString(configFilePath);
-                if (!TextUtils.isEmpty(fileStr)) rootJson = new JSONObject(fileStr);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (rootJson == null) {
-                loadConfigFroXml();
-                return;
-            }
-            packageFilter = rootJson.optString(Constant.APP_PACKAGE_KEY, "abcdefg");
-            titleFilter = rootJson.optString(Constant.TITLE_FILTER_KEY, null);
-            msgFilter = rootJson.optString(Constant.MESSAGE_FILTER_KEY, null);
-            playMusic = rootJson.optBoolean(Constant.PLAY_MUSIC_KEY, true);
-            zhenDong = rootJson.optBoolean(Constant.PLAY_ZHENGDONG_KEY, false);
-            cancelable = rootJson.optBoolean(Constant.CANCEL_ABLE_KEY, true);
-            sleepTime = rootJson.optLong(Constant.PLAY_SLEEP_TIME_KEY, 4000L);
-            if (sleepTime < 500) sleepTime = 500;
-
-            putConfigToXml(this, packageFilter, titleFilter, msgFilter,
-                    playMusic, zhenDong, cancelable, sleepTime);
-        }
-    }
-
-    private void loadConfigFroXml() {
-        packageFilter = PreUtils.get(this, Constant.APP_PACKAGE_KEY, "abcdefg");
-        titleFilter = PreUtils.get(this, Constant.TITLE_FILTER_KEY, null);
-        msgFilter = PreUtils.get(this, Constant.MESSAGE_FILTER_KEY, null);
-        playMusic = PreUtils.get(this, Constant.PLAY_MUSIC_KEY, true);
-        zhenDong = PreUtils.get(this, Constant.PLAY_ZHENGDONG_KEY, false);
-        cancelable = PreUtils.get(this, Constant.CANCEL_ABLE_KEY, true);
-        sleepTime = PreUtils.get(this, Constant.PLAY_SLEEP_TIME_KEY, 4000L);
-        if (sleepTime < 500) sleepTime = 500;
-    }
-
-    public static void putConfigToXml(Context context, String appPackage, String titleFilter, String messageFilter,
-                                      boolean playMusic, boolean zhengDong, boolean cancelable, long sleepTime) {
-        PreUtils.put(context, Constant.APP_PACKAGE_KEY,
-                appPackage);
-        PreUtils.put(context, Constant.TITLE_FILTER_KEY,
-                titleFilter);
-        PreUtils.put(context, Constant.MESSAGE_FILTER_KEY,
-                messageFilter);
-        PreUtils.put(context, Constant.PLAY_MUSIC_KEY,
-                playMusic);
-        PreUtils.put(context, Constant.PLAY_ZHENGDONG_KEY,
-                zhengDong);
-        PreUtils.put(context, Constant.CANCEL_ABLE_KEY,
-                cancelable);
-
-        PreUtils.put(context, Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
+        config = ConfigEntry.getInstance();
+        config.InitConfig(this);
     }
 
     private void clearNfSbnAndStopSound() {
@@ -221,11 +135,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private boolean isSettingMessage(StatusBarNotification sbn) {
-        if (!(TextUtils.isEmpty(packageFilter)
-                || packageFilter.equals(sbn.getPackageName())))
+        if (!(TextUtils.isEmpty(config.getPackageFilter())
+                || config.getPackageFilter().equals(sbn.getPackageName())))
             return false;
 
-        if (!cancelable && !sbn.isClearable())
+        if (!config.isCancelable() && !sbn.isClearable())
             return false;
 
         Bundle extras = sbn.getNotification().extras;
@@ -234,13 +148,13 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         CharSequence notificationTextChar = extras.getCharSequence(Notification.EXTRA_TEXT);
         CharSequence subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
 
-        if (!TextUtils.isEmpty(titleFilter)) {
+        if (!TextUtils.isEmpty(config.getTitleFilter())) {
             if (TextUtils.isEmpty(notificationTitle))
                 return false;
-            if (!notificationTitle.toString().contains(titleFilter))
+            if (!notificationTitle.toString().contains(config.getTitleFilter()))
                 return false;
         }
-        if (!TextUtils.isEmpty(msgFilter)) {
+        if (!TextUtils.isEmpty(config.getMsgFilter())) {
             String notificationText;
             if (!TextUtils.isEmpty(notificationTextChar)) {
                 if (!TextUtils.isEmpty(subText))
@@ -250,7 +164,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             } else if (!TextUtils.isEmpty(subText))
                 notificationText = subText.toString();
             else return false;
-            return notificationText.contains(msgFilter);
+            return notificationText.contains(config.getMsgFilter());
         }
         return true;
     }
@@ -272,7 +186,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         if (delay > 0) {
             handler.sendMessageDelayed(msg, delay);
             if (pm != null)
-                pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "messagelisenter:wakelock").acquire(Math.round(sleepTime * 1.5));
+                pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "messagelisenter:wakelock")
+                        .acquire(Math.round(config.getSleepTime() * 1.5));
         } else {
             handler.sendMessage(msg);
         }
@@ -282,7 +197,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         if (startLockActivity) {
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_LENGTH, ntfMsgList.size());
-
             startActivity(intent);
         } else
             updataMessageData();
@@ -333,7 +247,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
      * 震动
      * */
     private void zhengDong(Vibrator vibrator) {
-        long vbtime = sleepTime / 4;
+        long vbtime = config.getSleepTime() / 4;
         if (vbtime > 1000) vbtime = 1000;
         long[] pattern = new long[]{vbtime, vbtime, vbtime, vbtime};
         if (vibrator != null)
@@ -466,16 +380,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     public boolean handleMessage(Message msg) {
 //        if (!hasMessage()) return true;
         int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
-        if (!playMusic && !zhenDong || !(battery > 15)
+        if (!config.isPlayMusic() && !config.isZhenDong() || !(battery > 15)
                 || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
             finishLockActivity();
             return true;
         }
 
-        startLooper(sleepTime, startBattery);
+        startLooper(config.getSleepTime(), startBattery);
 
-        if (playMusic) playNotifySound(rt);
-        if (zhenDong) zhengDong(vibrator);
+        if (config.isPlayMusic()) playNotifySound(rt);
+        if (config.isZhenDong()) zhengDong(vibrator);
 
         return true;
     }

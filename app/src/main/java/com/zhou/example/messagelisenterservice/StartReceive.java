@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import java.io.File;
-
 /**
  * Created by user68 on 2018/7/30.
  * <p>
@@ -16,55 +14,40 @@ import java.io.File;
 
 public class StartReceive extends BroadcastReceiver {
 
-    private final static String ACTION_BOOT = "android.intent.action.BOOT_COMPLETED";
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (!Constant.REMOTE_SERVICE_START_ACTION.equals(intent.getAction())
-                && !ACTION_BOOT.equals(intent.getAction())) {
+
+        if (Constant.START_SETTING_ACTIVITY_ACTION.equals(intent.getAction())) {
+            Intent startActivityIntent = new Intent(context, SettingActivity.class);
+            startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(startActivityIntent);
             return;
         }
-
         if (Constant.REMOTE_SERVICE_START_ACTION.equals(intent.getAction())) {
             if (intent.getIntExtra(Constant.KILL_SERVICE_TAG_KEY, -1)
                     == Constant.KILL_SERVICE_TAG) {
+                Intent intent1 = new Intent(context, MessageLisenter.class);
+                context.stopService(intent1);
                 killProcess();
                 return;
             }
+            ConfigEntry configEntry = ConfigEntry.getInstance();
 
-            String appPackage = intent.getStringExtra(Constant.APP_PACKAGE_KEY);
-            String titleFilter = intent.getStringExtra(Constant.TITLE_FILTER_KEY);
-            String messageFilter = intent.getStringExtra(Constant.MESSAGE_FILTER_KEY);
-            boolean playMusic = intent.getBooleanExtra(Constant.PLAY_MUSIC_KEY, true);
-            boolean zhengDong = intent.getBooleanExtra(Constant.PLAY_ZHENGDONG_KEY, false);
-            boolean cancelable = intent.getBooleanExtra(Constant.CANCEL_ABLE_KEY, true);
-            long sleepTime = 4000;
-            try {
-                sleepTime = Long.valueOf(intent.getStringExtra(Constant.PLAY_SLEEP_TIME_KEY));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            MessageLisenter.putConfigToXml(context, appPackage, titleFilter, messageFilter,
-                    playMusic, zhengDong, cancelable, sleepTime);
-
-            String configFilePath = MessageLisenter.getConfigFilePath(context);
-            File configFile = configFilePath == null ? null : new File(configFilePath);
-            if (configFile != null && configFile.exists()) {
-                FileUtils fileUtils = new FileUtils();
-                fileUtils.deleteFileSafely(configFile);
-            }
+            configEntry.setConfig(intent);
+            configEntry.writeConfig(context);
         }
         Intent intent1 = new Intent(context, MessageLisenter.class);
         context.stopService(intent1);
 
+        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startService(intent1);
         toggleNotificationListenerService(context);
     }
 
     private void killProcess() {
         System.exit(0);
-        android.os.Process.killProcess(android.os.Process.myPid());
+//        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     private void toggleNotificationListenerService(Context context) {

@@ -5,4 +5,16 @@
     <string name="show_message_count">你有来自 %s 的 %d 条消息需要查看</string>
     <string name="filter_text">关键字 %s</string>
     <string name="close">关闭</string>
+
+    <string name="input_app_name">请输入应用包名</string>
+    <string name="wx_app_name">com.tencent.mm</string>
+    <string name="input_title_filter">请输入消息头</string>
+    <string name="input_message_filter">请输入消息内容</string>
+    <string name="play_sleep_time">提示间隔时间</string>
+    <string name="sleep_time">4000</string>
+    <string name="apply_setting">应用配置</string>
+    <string name="start_setting">打开设置</string>
+    <string name="play_music">声音:</string>
+    <string name="zheng_dong">震动:</string>
+    <string name="contains_service">包括服务</string>
 </resources>

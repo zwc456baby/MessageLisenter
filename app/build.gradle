@@ -1,4 +1,3 @@
-import com.android.builder.model.SigningConfig
 
 apply plugin: 'com.android.application'
 
@@ -17,16 +16,16 @@ android {
         assembleRelease {
             storeFile file('Apk_jks.jks')//签名文件路径，
             //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
-            storePassword 'xxx' //密码
-            keyAlias 'xxx'
-            keyPassword 'xxx'  //密码
+            storePassword KEY_PASS //密码
+            keyAlias KEY_STORE
+            keyPassword KEY_PASS  //密码
         }
         debugConfig {
             storeFile file('Apk_jks.jks')//签名文件路径，
             //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
-            storePassword 'xxx' //密码
-            keyAlias 'xxx'
-            keyPassword 'xxx'  //密码
+            storePassword KEY_PASS //密码
+            keyAlias KEY_STORE
+            keyPassword KEY_PASS  //密码
         }
     }
 
