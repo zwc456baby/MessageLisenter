@@ -63,6 +63,12 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         showTv.setText(showTvText);
     }
 
+    private void sendPauseNotifyBroadcast() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
+        sendBroadcast(sendIntent);
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -73,7 +79,7 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.closeBtn:
-                finishAndRemoveTask();
+                sendPauseNotifyBroadcast();
                 break;
         }
     }

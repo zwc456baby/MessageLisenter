@@ -59,6 +59,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final int looperWhat = 0;
 
     private boolean startLockActivity = false;
+    private boolean pauseNotify = false;
 
     @Override
     public void onCreate() {
@@ -176,8 +177,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void startPlaySound(StatusBarNotification sbn) {
         addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
-        if (!handler.hasMessages(looperWhat))
+        if (!handler.hasMessages(looperWhat)) {
+            pauseNotify = false; // 收到新通知时，重置通知状态
             startLooper(0, battery);
+        }
         startLockActivity();
     }
 
@@ -269,6 +272,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_USER_PRESENT);
+        filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -378,9 +382,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public boolean handleMessage(Message msg) {
-//        if (!hasMessage()) return true;
         int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
-        if (!config.isPlayMusic() && !config.isZhenDong() || !(battery > 15)
+        if (pauseNotify || !config.isPlayMusic() && !config.isZhenDong() || !(battery > 15)
                 || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
             finishLockActivity();
             return true;
@@ -439,6 +442,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                 startLockActivity = false;
                 finishLockActivity();
+            } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
+                pauseNotify = true; //当锁屏页面的activity 被关闭时，暂停通知
+                stopPlaySound();
             }
         }
     };
