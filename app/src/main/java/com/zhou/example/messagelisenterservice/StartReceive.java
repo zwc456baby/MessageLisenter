@@ -33,7 +33,7 @@ public class StartReceive extends BroadcastReceiver {
                 return;
             }
             ConfigEntry configEntry = ConfigEntry.getInstance();
-
+            
             configEntry.setConfig(intent);
             configEntry.writeConfig(context);
         }

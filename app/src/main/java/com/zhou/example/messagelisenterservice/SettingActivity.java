@@ -46,6 +46,8 @@ public class SettingActivity extends Activity {
 
     private void setViewData() {
         ConfigEntry configEntry = ConfigEntry.getInstance();
+        configEntry.InitConfig(this);
+
         appNameEdit.setText(configEntry.getPackageFilter());
         titleInEdit.setText(configEntry.getTitleFilter());
         messageInEdit.setText(configEntry.getMsgFilter());
