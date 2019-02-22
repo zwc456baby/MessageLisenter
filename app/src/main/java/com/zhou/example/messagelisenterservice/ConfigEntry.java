@@ -21,6 +21,8 @@ public class ConfigEntry {
     private boolean closePauseNotify;
     private long pauseNotifyTime;
 
+    private boolean pauseApplyToAllPage;
+
     private ConfigEntry() {
     }
 
@@ -78,6 +80,8 @@ public class ConfigEntry {
         sleepTime = rootJson.optLong(Constant.PLAY_SLEEP_TIME_KEY, 4000L);
         closePauseNotify = rootJson.optBoolean(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
         pauseNotifyTime = rootJson.optLong(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
+        pauseApplyToAllPage = rootJson.optBoolean(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
+
         if (sleepTime < 500) sleepTime = 500;
 
     }
@@ -97,6 +101,7 @@ public class ConfigEntry {
             rootJson.put(Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
             rootJson.put(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
             rootJson.put(Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
+            rootJson.put(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
 
             fileUtils.putStringToFile(configFilePath, rootJson.toString());
         } catch (JSONException e) {
@@ -114,6 +119,8 @@ public class ConfigEntry {
         sleepTime = PreUtils.get(context, Constant.PLAY_SLEEP_TIME_KEY, 4000L);
         closePauseNotify = PreUtils.get(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
         pauseNotifyTime = PreUtils.get(context, Constant.PAUSE_NOTIFY_TIME_KEY, -1);
+        pauseApplyToAllPage = PreUtils.get(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
+
         if (sleepTime < 500) sleepTime = 500;
     }
 
@@ -134,6 +141,7 @@ public class ConfigEntry {
         PreUtils.put(context, Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
         PreUtils.put(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
         PreUtils.put(context, Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
+        PreUtils.put(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
     }
 
     public void setConfig(Intent intent) {
@@ -151,15 +159,16 @@ public class ConfigEntry {
         }
         boolean pauseNotifyEnable = intent.getBooleanExtra(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
         long pauseNotifyTime = intent.getLongExtra(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
+        boolean pauseApplyToAllPage = intent.getBooleanExtra(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
 
         setConfig(appPackage, titleFilter, messageFilter,
                 playMusic, zhengDong, cancelable, sleepTime
-                , pauseNotifyEnable, pauseNotifyTime);
+                , pauseNotifyEnable, pauseNotifyTime, pauseApplyToAllPage);
     }
 
     private void setConfig(String packageFilter, String titleFilter, String msgFilter
             , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime
-            , boolean closePauseNotify, long pauseNotifyTime) {
+            , boolean closePauseNotify, long pauseNotifyTime, boolean pauseApplyToAllPage) {
         this.packageFilter = packageFilter;
         this.titleFilter = titleFilter;
         this.msgFilter = msgFilter;
@@ -169,6 +178,7 @@ public class ConfigEntry {
         this.sleepTime = sleepTime;
         this.closePauseNotify = closePauseNotify;
         this.pauseNotifyTime = pauseNotifyTime;
+        this.pauseApplyToAllPage = pauseApplyToAllPage;
     }
 
     /************              get and se method *****************/
@@ -176,71 +186,40 @@ public class ConfigEntry {
         return packageFilter;
     }
 
-    public void setPackageFilter(String packageFilter) {
-        this.packageFilter = packageFilter;
-    }
-
     public String getTitleFilter() {
         return titleFilter;
-    }
-
-    public void setTitleFilter(String titleFilter) {
-        this.titleFilter = titleFilter;
     }
 
     public String getMsgFilter() {
         return msgFilter;
     }
 
-    public void setMsgFilter(String msgFilter) {
-        this.msgFilter = msgFilter;
-    }
-
     public boolean isPlayMusic() {
         return playMusic;
-    }
-
-    public void setPlayMusic(boolean playMusic) {
-        this.playMusic = playMusic;
     }
 
     public boolean isZhenDong() {
         return zhenDong;
     }
 
-    public void setZhenDong(boolean zhenDong) {
-        this.zhenDong = zhenDong;
-    }
-
     public boolean isCancelable() {
         return cancelable;
-    }
-
-    public void setCancelable(boolean cancelable) {
-        this.cancelable = cancelable;
     }
 
     public long getSleepTime() {
         return sleepTime;
     }
 
-    public void setSleepTime(long sleepTime) {
-        this.sleepTime = sleepTime;
-    }
-
     public boolean isClosePauseNotify() {
         return closePauseNotify;
-    }
-
-    public void setClosePauseNotify(boolean closePauseNotify) {
-        this.closePauseNotify = closePauseNotify;
     }
 
     public long getPauseNotifyTime() {
         return pauseNotifyTime;
     }
 
-    public void setPauseNotifyTime(int pauseNotifyTime) {
-        this.pauseNotifyTime = pauseNotifyTime;
+    public boolean isPauseApplyToAllPage() {
+        return pauseApplyToAllPage;
     }
+
 }

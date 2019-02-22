@@ -60,7 +60,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private boolean startLockActivity = false;
     private boolean waitBatteryNotify = false;
-    private long receiveCloseTime = -1;
+    private long closeNotifyTime = -1;
 
     @Override
     public void onCreate() {
@@ -122,7 +122,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void reloadConfig() {
         waitBatteryNotify = false;
-        receiveCloseTime = -1;
+        closeNotifyTime = -1;
         config = ConfigEntry.getInstance();
         config.InitConfig(this);
     }
@@ -184,7 +184,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         if (!handler.hasMessages(looperWhat)) {
             // 用户勾选了暂停后指定时间不提示，而通过判断，它确实没有到达指定时间，则暂停通知，且等待电池状态改变后唤起
             if (ConfigEntry.getInstance().isClosePauseNotify()
-                    && !((SystemClock.elapsedRealtime() - (receiveCloseTime)) > config.getPauseNotifyTime())) {
+                    && !((SystemClock.elapsedRealtime() - (closeNotifyTime)) > config.getPauseNotifyTime())) {
                 waitBatteryNotify = true;
                 return;
             }
@@ -234,7 +234,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         removeNtfSbn(ntfMsgList, pkgName, sbnId);
         removeNtfSbn(tmpNullMsgList, pkgName, sbnId);
         if (!handler.hasMessages(looperWhat)) return;
-        if (!hasMessage(ntfMsgList)) stopPlaySound();
+        if (!hasMessage(ntfMsgList)) {
+            if (config.isPauseApplyToAllPage())
+                closeNotifyTime = SystemClock.elapsedRealtime();
+            stopPlaySound();
+        }
     }
 
     private void stopPlaySound() {
@@ -458,7 +462,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 finishLockActivity();
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
                 //当锁屏页面的activity 被关闭时，暂停通知
-                receiveCloseTime = SystemClock.elapsedRealtime();
+                closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound();
             }
         }

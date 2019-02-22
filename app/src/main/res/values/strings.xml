@@ -16,6 +16,7 @@
     <string name="play_music">声音:</string>
     <string name="zheng_dong">震动:</string>
     <string name="contains_service">包括服务</string>
-    <string name="pause_notify_time">关闭后是否暂停提示</string>
-    <string name="pause_notify_time_hint">关闭后暂停提示的时间(单位:分钟)</string>
+    <string name="pause_notify_time">关闭后是否暂停通知</string>
+    <string name="pause_notify_time_hint">关闭后暂停通知的时间(单位:分钟)</string>
+    <string name="pause_notify_page_text">暂停通知对所有页面生效</string>
 </resources>

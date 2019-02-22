@@ -121,11 +121,30 @@
                     style="@style/setting_checkbox" />
             </RelativeLayout>
 
+            <TextView
+                style="@style/setting_edit_text"
+                android:text="@string/pause_notify_time_hint" />
+
             <EditText
                 android:id="@+id/pauseNotifyEdit"
                 style="@style/setting_edit"
                 android:hint="@string/pause_notify_time_hint"
                 android:inputType="number" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/setting_checkbox_text"
+                    android:layout_alignStart="@id/pauseApplyToAllPageCheck"
+                    android:text="@string/pause_notify_page_text" />
+
+                <CheckBox
+                    android:id="@+id/pauseApplyToAllPageCheck"
+                    style="@style/setting_checkbox" />
+            </RelativeLayout>
+
         </LinearLayout>
 
     </ScrollView>

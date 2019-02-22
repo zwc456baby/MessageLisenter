@@ -10,7 +10,6 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 
 public class SettingActivity extends Activity {
@@ -20,7 +19,7 @@ public class SettingActivity extends Activity {
 
     private Button startBtn, startSettingBtn;
 
-    private CheckBox playMusic, zhengDong, containsService, pauseNotifyCheck;
+    private CheckBox playMusic, zhengDong, containsService, pauseNotifyCheck, pauseApplyToAllPageCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +44,7 @@ public class SettingActivity extends Activity {
         zhengDong = findViewById(R.id.zhendongCheck);
         containsService = findViewById(R.id.containsServiceCheck);
         pauseNotifyCheck = findViewById(R.id.pauseNotifyCheck);
+        pauseApplyToAllPageCheck = findViewById(R.id.pauseApplyToAllPageCheck);
     }
 
     private void setViewData() {
@@ -61,8 +61,7 @@ public class SettingActivity extends Activity {
         zhengDong.setChecked(configEntry.isZhenDong());
         containsService.setChecked(configEntry.isCancelable());
         pauseNotifyCheck.setChecked(configEntry.isClosePauseNotify());
-
-        InitNotifyEditStatus(configEntry.isClosePauseNotify());
+        pauseApplyToAllPageCheck.setChecked(configEntry.isPauseApplyToAllPage());
     }
 
     private void setViewLisenter() {
@@ -79,20 +78,6 @@ public class SettingActivity extends Activity {
                 gotoNotificationAccessSetting(SettingActivity.this);
             }
         });
-
-        pauseNotifyCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                InitNotifyEditStatus(isChecked);
-            }
-        });
-    }
-
-    private void InitNotifyEditStatus(boolean isChecked) {
-        if (isChecked)
-            pauseNotifyEdit.setVisibility(View.VISIBLE);
-        else
-            pauseNotifyEdit.setVisibility(View.GONE);
     }
 
     private void startRemoteService() {
@@ -112,6 +97,7 @@ public class SettingActivity extends Activity {
         intent.putExtra(Constant.PLAY_ZHENGDONG_KEY, zhengDong.isChecked());
         intent.putExtra(Constant.CANCEL_ABLE_KEY, containsService.isChecked());
         intent.putExtra(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, pauseNotifyCheck.isChecked());
+        intent.putExtra(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPageCheck.isChecked());
 
         intent.setComponent(new ComponentName("com.zhou.example.messagelisenterservice",
                 "com.zhou.example.messagelisenterservice.StartReceive"));
