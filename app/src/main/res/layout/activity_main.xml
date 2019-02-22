@@ -24,76 +24,41 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/input_app_name"
-                android:textSize="16sp" />
+                style="@style/setting_edit_text"
+                android:text="@string/input_app_name" />
 
             <EditText
                 android:id="@+id/input_app_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:hint="@string/input_app_name"
-                android:inputType="text"
-                android:textColor="#000"
-                android:textSize="18sp" />
+                style="@style/setting_edit"
+                android:hint="@string/input_app_name" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/input_title_filter"
-                android:textSize="16sp" />
+                style="@style/setting_edit_text"
+                android:text="@string/input_title_filter" />
 
             <EditText
                 android:id="@+id/input_title_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:hint="@string/input_title_filter"
-                android:inputType="text"
-                android:textColor="#000"
-                android:textSize="18sp" />
+                style="@style/setting_edit"
+                android:hint="@string/input_title_filter" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/input_message_filter"
-                android:textSize="16sp" />
+                style="@style/setting_edit_text"
+                android:text="@string/input_message_filter" />
 
             <EditText
                 android:id="@+id/input_message_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:hint="@string/input_message_filter"
-                android:inputType="text"
-                android:textColor="#000"
-                android:textSize="18sp" />
+                style="@style/setting_edit"
+                android:hint="@string/input_message_filter" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/play_sleep_time"
-                android:textSize="16sp" />
+                style="@style/setting_edit_text"
+                android:text="@string/play_sleep_time" />
 
             <EditText
                 android:id="@+id/playSleepTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
+                style="@style/setting_edit"
                 android:inputType="number"
-                android:text="@string/sleep_time"
-                android:textColor="#000"
-                android:textSize="18sp" />
+                android:text="@string/sleep_time" />
 
             <!--<LinearLayout-->
             <!--android:layout_width="match_parent"-->
@@ -105,22 +70,13 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/setting_checkbox_text"
                     android:layout_alignStart="@id/playMusicCheck"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:gravity="start"
-                    android:text="@string/play_music"
-                    android:textColor="#000"
-                    android:textSize="18sp" />
+                    android:text="@string/play_music" />
 
                 <CheckBox
                     android:id="@+id/playMusicCheck"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
+                    style="@style/setting_checkbox" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -128,22 +84,13 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/setting_checkbox_text"
                     android:layout_alignStart="@id/zhendongCheck"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:gravity="start"
-                    android:text="@string/zheng_dong"
-                    android:textColor="#000"
-                    android:textSize="18sp" />
+                    android:text="@string/zheng_dong" />
 
                 <CheckBox
                     android:id="@+id/zhendongCheck"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
+                    style="@style/setting_checkbox" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -151,22 +98,13 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/setting_checkbox_text"
                     android:layout_alignStart="@id/containsService"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:gravity="start"
-                    android:text="@string/contains_service"
-                    android:textColor="#000"
-                    android:textSize="18sp" />
+                    android:text="@string/contains_service" />
 
                 <CheckBox
                     android:id="@+id/containsService"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
+                    style="@style/setting_checkbox" />
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
