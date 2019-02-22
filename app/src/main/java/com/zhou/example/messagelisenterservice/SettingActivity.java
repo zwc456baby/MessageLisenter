@@ -10,16 +10,17 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 public class SettingActivity extends Activity {
 
 
-    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime;
+    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit;
 
     private Button startBtn, startSettingBtn;
 
-    private CheckBox playMusic, zhengDong, containsService;
+    private CheckBox playMusic, zhengDong, containsService, pauseNotifyCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,15 @@ public class SettingActivity extends Activity {
         titleInEdit = findViewById(R.id.input_title_filter);
         messageInEdit = findViewById(R.id.input_message_filter);
         playSleepTime = findViewById(R.id.playSleepTime);
+        pauseNotifyEdit = findViewById(R.id.pauseNotifyEdit);
 
         startBtn = findViewById(R.id.startBtn);
         startSettingBtn = findViewById(R.id.startSettingBtn);
 
         playMusic = findViewById(R.id.playMusicCheck);
         zhengDong = findViewById(R.id.zhendongCheck);
-        containsService = findViewById(R.id.containsService);
+        containsService = findViewById(R.id.containsServiceCheck);
+        pauseNotifyCheck = findViewById(R.id.pauseNotifyCheck);
     }
 
     private void setViewData() {
@@ -52,10 +55,14 @@ public class SettingActivity extends Activity {
         titleInEdit.setText(configEntry.getTitleFilter());
         messageInEdit.setText(configEntry.getMsgFilter());
         playSleepTime.setText(String.valueOf(configEntry.getSleepTime()));
+        pauseNotifyEdit.setText(String.valueOf(configEntry.getPauseNotifyTime() / 60 / 1000));
 
         playMusic.setChecked(configEntry.isPlayMusic());
         zhengDong.setChecked(configEntry.isZhenDong());
         containsService.setChecked(configEntry.isCancelable());
+        pauseNotifyCheck.setChecked(configEntry.isClosePauseNotify());
+
+        InitNotifyEditStatus(configEntry.isClosePauseNotify());
     }
 
     private void setViewLisenter() {
@@ -72,6 +79,20 @@ public class SettingActivity extends Activity {
                 gotoNotificationAccessSetting(SettingActivity.this);
             }
         });
+
+        pauseNotifyCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                InitNotifyEditStatus(isChecked);
+            }
+        });
+    }
+
+    private void InitNotifyEditStatus(boolean isChecked) {
+        if (isChecked)
+            pauseNotifyEdit.setVisibility(View.VISIBLE);
+        else
+            pauseNotifyEdit.setVisibility(View.GONE);
     }
 
     private void startRemoteService() {
@@ -85,10 +106,12 @@ public class SettingActivity extends Activity {
         intent.putExtra(Constant.TITLE_FILTER_KEY, titleInEdit.getText().toString());
         intent.putExtra(Constant.MESSAGE_FILTER_KEY, messageInEdit.getText().toString());
         intent.putExtra(Constant.PLAY_SLEEP_TIME_KEY, playSleepTime.getText().toString());
+        intent.putExtra(Constant.PAUSE_NOTIFY_TIME_KEY, Long.valueOf(pauseNotifyEdit.getText().toString()) * 60 * 1000);
 
         intent.putExtra(Constant.PLAY_MUSIC_KEY, playMusic.isChecked());
         intent.putExtra(Constant.PLAY_ZHENGDONG_KEY, zhengDong.isChecked());
         intent.putExtra(Constant.CANCEL_ABLE_KEY, containsService.isChecked());
+        intent.putExtra(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, pauseNotifyCheck.isChecked());
 
         intent.setComponent(new ComponentName("com.zhou.example.messagelisenterservice",
                 "com.zhou.example.messagelisenterservice.StartReceive"));

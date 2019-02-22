@@ -59,7 +59,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final int looperWhat = 0;
 
     private boolean startLockActivity = false;
-    private boolean pauseNotify = false;
+    private boolean waitBatteryNotify = false;
+    private long receiveCloseTime = -1;
 
     @Override
     public void onCreate() {
@@ -120,6 +121,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void reloadConfig() {
+        waitBatteryNotify = false;
+        receiveCloseTime = -1;
         config = ConfigEntry.getInstance();
         config.InitConfig(this);
     }
@@ -171,14 +174,21 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void tryStartPlaySound(StatusBarNotification sbn) {
-        if (isSettingMessage(sbn))
-            startPlaySound(sbn);
+        if (isSettingMessage(sbn)) {
+            addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
+            startPlaySound();
+        }
     }
 
-    private void startPlaySound(StatusBarNotification sbn) {
-        addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
+    private void startPlaySound() {
         if (!handler.hasMessages(looperWhat)) {
-            pauseNotify = false; // 收到新通知时，重置通知状态
+            // 用户勾选了暂停后指定时间不提示，而通过判断，它确实没有到达指定时间，则暂停通知，且等待电池状态改变后唤起
+            if (ConfigEntry.getInstance().isClosePauseNotify()
+                    && !((SystemClock.elapsedRealtime() - (receiveCloseTime)) > config.getPauseNotifyTime())) {
+                waitBatteryNotify = true;
+                return;
+            }
+            waitBatteryNotify = false;
             startLooper(0, battery);
         }
         startLockActivity();
@@ -382,10 +392,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public boolean handleMessage(Message msg) {
+        if (!(battery > 15)) {
+            waitBatteryNotify = true;
+            stopPlaySound();
+            return true;
+        }
+
         int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
-        if (pauseNotify || !config.isPlayMusic() && !config.isZhenDong() || !(battery > 15)
+        if (!config.isPlayMusic() && !config.isZhenDong()
                 || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
-            finishLockActivity();
+            stopPlaySound();
             return true;
         }
 
@@ -425,16 +441,13 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     Toast.makeText(context, "消息监听服务运行中", Toast.LENGTH_SHORT).show();
                 }
             } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-                int tmpBattery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
-                if (tmpBattery <= battery) {
-                    battery = tmpBattery;
-                    return; //电量在减少，不做任何操作
-                }
-                battery = tmpBattery;
+                battery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
+                if (!waitBatteryNotify)
+                    return;
+
                 if (hasMessage(ntfMsgList) && battery > 20
-                        && !handler.hasMessages(looperWhat) && !pauseNotify) {
-                    startLooper(0, battery);
-                    startLockActivity();
+                        && !handler.hasMessages(looperWhat)) {
+                    startPlaySound();
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                 startLockActivity = true;
@@ -444,7 +457,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 startLockActivity = false;
                 finishLockActivity();
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
-                pauseNotify = true; //当锁屏页面的activity 被关闭时，暂停通知
+                //当锁屏页面的activity 被关闭时，暂停通知
+                receiveCloseTime = SystemClock.elapsedRealtime();
                 stopPlaySound();
             }
         }

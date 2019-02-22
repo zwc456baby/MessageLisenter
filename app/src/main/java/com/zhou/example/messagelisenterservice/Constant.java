@@ -14,6 +14,8 @@ public class Constant {
     public final static String PLAY_SLEEP_TIME_KEY = "play_sleep_time_key";
     public final static String KILL_SERVICE_TAG_KEY = "kill_service_tag_key";
     public final static String CANCEL_ABLE_KEY = "cancel_able_key";
+    public final static String CLOSE_PAUSE_NOTIFY_ENABLE_KEY = "close_pause_notify_enable_key";
+    public final static String PAUSE_NOTIFY_TIME_KEY = "pause_notify_time_key";
 
     public final static String GET_MESSAGE_LENGTH = "get_message_length";
 

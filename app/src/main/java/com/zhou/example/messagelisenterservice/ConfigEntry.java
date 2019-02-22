@@ -18,6 +18,8 @@ public class ConfigEntry {
     private boolean zhenDong;
     private boolean cancelable;
     private long sleepTime;
+    private boolean closePauseNotify;
+    private long pauseNotifyTime;
 
     private ConfigEntry() {
     }
@@ -74,6 +76,8 @@ public class ConfigEntry {
         zhenDong = rootJson.optBoolean(Constant.PLAY_ZHENGDONG_KEY, false);
         cancelable = rootJson.optBoolean(Constant.CANCEL_ABLE_KEY, true);
         sleepTime = rootJson.optLong(Constant.PLAY_SLEEP_TIME_KEY, 4000L);
+        closePauseNotify = rootJson.optBoolean(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
+        pauseNotifyTime = rootJson.optLong(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
         if (sleepTime < 500) sleepTime = 500;
 
     }
@@ -91,6 +95,8 @@ public class ConfigEntry {
             rootJson.put(Constant.PLAY_ZHENGDONG_KEY, zhenDong);
             rootJson.put(Constant.CANCEL_ABLE_KEY, cancelable);
             rootJson.put(Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
+            rootJson.put(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
+            rootJson.put(Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
 
             fileUtils.putStringToFile(configFilePath, rootJson.toString());
         } catch (JSONException e) {
@@ -106,6 +112,8 @@ public class ConfigEntry {
         zhenDong = PreUtils.get(context, Constant.PLAY_ZHENGDONG_KEY, false);
         cancelable = PreUtils.get(context, Constant.CANCEL_ABLE_KEY, true);
         sleepTime = PreUtils.get(context, Constant.PLAY_SLEEP_TIME_KEY, 4000L);
+        closePauseNotify = PreUtils.get(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
+        pauseNotifyTime = PreUtils.get(context, Constant.PAUSE_NOTIFY_TIME_KEY, -1);
         if (sleepTime < 500) sleepTime = 500;
     }
 
@@ -124,6 +132,8 @@ public class ConfigEntry {
                 cancelable);
 
         PreUtils.put(context, Constant.PLAY_SLEEP_TIME_KEY, sleepTime);
+        PreUtils.put(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
+        PreUtils.put(context, Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
     }
 
     public void setConfig(Intent intent) {
@@ -139,12 +149,17 @@ public class ConfigEntry {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        boolean pauseNotifyEnable = intent.getBooleanExtra(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
+        long pauseNotifyTime = intent.getLongExtra(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
+
         setConfig(appPackage, titleFilter, messageFilter,
-                playMusic, zhengDong, cancelable, sleepTime);
+                playMusic, zhengDong, cancelable, sleepTime
+                , pauseNotifyEnable, pauseNotifyTime);
     }
 
     private void setConfig(String packageFilter, String titleFilter, String msgFilter
-            , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime) {
+            , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime
+            , boolean closePauseNotify, long pauseNotifyTime) {
         this.packageFilter = packageFilter;
         this.titleFilter = titleFilter;
         this.msgFilter = msgFilter;
@@ -152,6 +167,8 @@ public class ConfigEntry {
         this.zhenDong = zhenDong;
         this.cancelable = cancelable;
         this.sleepTime = sleepTime;
+        this.closePauseNotify = closePauseNotify;
+        this.pauseNotifyTime = pauseNotifyTime;
     }
 
     /************              get and se method *****************/
@@ -209,5 +226,21 @@ public class ConfigEntry {
 
     public void setSleepTime(long sleepTime) {
         this.sleepTime = sleepTime;
+    }
+
+    public boolean isClosePauseNotify() {
+        return closePauseNotify;
+    }
+
+    public void setClosePauseNotify(boolean closePauseNotify) {
+        this.closePauseNotify = closePauseNotify;
+    }
+
+    public long getPauseNotifyTime() {
+        return pauseNotifyTime;
+    }
+
+    public void setPauseNotifyTime(int pauseNotifyTime) {
+        this.pauseNotifyTime = pauseNotifyTime;
     }
 }

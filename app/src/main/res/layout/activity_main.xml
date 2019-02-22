@@ -99,14 +99,35 @@
 
                 <TextView
                     style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/containsService"
+                    android:layout_alignStart="@id/containsServiceCheck"
                     android:text="@string/contains_service" />
 
                 <CheckBox
-                    android:id="@+id/containsService"
+                    android:id="@+id/containsServiceCheck"
                     style="@style/setting_checkbox" />
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/setting_checkbox_text"
+                    android:layout_alignStart="@id/pauseNotifyCheck"
+                    android:text="@string/pause_notify_time" />
+
+                <CheckBox
+                    android:id="@+id/pauseNotifyCheck"
+                    style="@style/setting_checkbox" />
+            </RelativeLayout>
+
+            <EditText
+                android:id="@+id/pauseNotifyEdit"
+                style="@style/setting_edit"
+                android:hint="@string/pause_notify_time_hint"
+                android:inputType="number" />
         </LinearLayout>
+
     </ScrollView>
 
     <LinearLayout
