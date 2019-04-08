@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/msg_list_item_text"
+            android:text="@string/package_text" />
+
+        <TextView
+            android:id="@+id/msg_list_item_package"
+            style="@style/msg_list_item_text" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/msg_list_item_text"
+            android:text="@string/time_text" />
+
+        <TextView
+            android:id="@+id/msg_list_item_time"
+            style="@style/msg_list_item_text" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/msg_list_item_text"
+            android:text="@string/body_text" />
+
+        <TextView
+            android:id="@+id/msg_list_item_body"
+            style="@style/msg_list_item_text" />
+    </LinearLayout>
+
+</LinearLayout>

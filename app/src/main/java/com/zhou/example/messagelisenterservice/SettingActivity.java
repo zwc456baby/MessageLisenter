@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-public class SettingActivity extends Activity {
+public class SettingActivity extends BaseActivity {
 
 
     private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit;
@@ -25,9 +25,6 @@ public class SettingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findView();
-        setViewData();
-        setViewLisenter();
     }
 
     private void findView() {
@@ -139,5 +136,12 @@ public class SettingActivity extends Activity {
     protected void onStop() {
         super.onStop();
         finishAndRemoveTask();
+    }
+
+    @Override
+    void InitView() {
+        findView();
+        setViewData();
+        setViewLisenter();
     }
 }

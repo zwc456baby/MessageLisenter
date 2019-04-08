@@ -19,4 +19,15 @@
     <string name="pause_notify_time">关闭后是否暂停通知</string>
     <string name="pause_notify_time_hint">关闭后暂停通知的时间(单位:分钟)</string>
     <string name="pause_notify_page_text">暂停通知对所有页面生效</string>
+
+    <string name="start_to_notify_btn">跳转通知栏消息记录页面</string>
+
+    <string name="package_text">包名:</string>
+    <string name="time_text">时间:</string>
+    <string name="body_text">内容:</string>
+
+    <string name="previous_page_text">上一页</string>
+    <string name="next_page_text">下一页</string>
+
+    <string name="current_page_text">%d/%d</string>
 </resources>

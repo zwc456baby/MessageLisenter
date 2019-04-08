@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:keepScreenOn="true"
+    tools:context=".LockShowActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/startToNotifyBtn"
+            style="@style/btn_start_to_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start_to_notify_btn" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/msg_show_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/page_select_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/page_previsous_btn"
+                style="@style/btn_list_select_page"
+                android:text="@string/previous_page_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/current_page_text"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/page_next_btn"
+                style="@style/btn_list_select_page"
+                android:text="@string/next_page_text" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

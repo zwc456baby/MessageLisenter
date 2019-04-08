@@ -12,7 +12,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class LockShowActivity extends Activity implements View.OnClickListener {
+public class LockShowActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView showTv;
 
@@ -24,7 +24,6 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_lock_show);
         registerBroadCast();
-        InitView();
         InitData();
     }
 
@@ -37,7 +36,7 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         unregisterReceiver(finishActivityBroadcast);
     }
 
-    private void InitView() {
+    protected void InitView() {
         Button closeBtn = findViewById(R.id.closeBtn);
         closeBtn.setOnClickListener(this);
         showTv = findViewById(R.id.showTv);

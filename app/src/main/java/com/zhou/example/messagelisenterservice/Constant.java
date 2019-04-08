@@ -1,11 +1,18 @@
 package com.zhou.example.messagelisenterservice;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
  * Created by user68 on 2018/7/30.
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Constant {
+
+    public final static String dayType = "yyyy-MM-dd HH:mm:ss";
+
     public final static String APP_PACKAGE_KEY = "app_package_key";
     public final static String TITLE_FILTER_KEY = "title_filter_key";
     public final static String MESSAGE_FILTER_KEY = "message_filter_key";
@@ -33,4 +40,5 @@ public class Constant {
 
     public final static int KILL_SERVICE_TAG = 1;
 
+    public final static int LIST_PAGE_ITEM = 100;
 }

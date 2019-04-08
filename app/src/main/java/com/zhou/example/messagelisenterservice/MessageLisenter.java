@@ -21,6 +21,10 @@ import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.zhou.example.messagelisenterservice.db.DBUtil;
+import com.zhou.example.messagelisenterservice.db.MsgEntry;
+import com.zhou.example.messagelisenterservice.db.MsgType;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,6 +33,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -40,8 +45,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 
-    private final String dayType = "yyyy-MM-dd HH:mm:ss";
-    private final DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
+    private final DateFormat dataFormat = new SimpleDateFormat(Constant.dayType, Locale.getDefault());
+
     private final ArrayList<MessageEnty> ntfMsgList = new ArrayList<>();
     // 暂存一下空的消息的包名和id
     private final ArrayList<MessageEnty> tmpNullMsgList = new ArrayList<>();
@@ -317,9 +322,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
         String time = dataFormat.format(Calendar.getInstance().getTime());
 
-        String writText = "\n" + "[" + time + "]" + "[" + packageName + "]" + "\n" +
-                "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +
+        String text = "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +
                 "[" + subText + "]" + "\n";
+
+        DBUtil.INSTANT.insert(new MsgEntry(MsgType.NOTIFY, packageName, new Date(), text));
+
+        String writText = "\n" + "[" + time + "]" + "[" + packageName + "]" + "\n" + text;
 
         putStr(writText);
     }
