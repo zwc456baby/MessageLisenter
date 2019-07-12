@@ -32,6 +32,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ForegroundActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance" />
+
         <service
             android:name=".MessageLisenter"
             android:exported="true"
@@ -42,7 +47,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".ForegoundServer" />
+        <service android:name=".ForegroundServer" />
 
         <receiver
             android:name=".StartReceive"

@@ -132,30 +132,29 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
-//        Intent startActivityIntent = new Intent(this, ForegoundActivity.class);
-//        startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//        startActivity(startActivityIntent);
-        try {
-            exitForeground();
-            Intent intent = new Intent(this, ForegoundServer.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent startActivityIntent = new Intent(this, ForegroundActivity.class);
+        startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startActivityIntent);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            } else {
-                startService(intent);
-            }
-        } catch (Exception ignore) {
+        exitForeground();
+        Intent intent = new Intent(this, ForegroundServer.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
         }
+
     }
 
     private void exitForeground() {
-//        Intent sendIntent = new Intent();
-//        sendIntent.setAction(Constant.FINISH_FOREGROUND_ACTIVITY);
-//        sendBroadcast(sendIntent);
         Log.i(TAG, "exitForeground");
-        Intent intent1 = new Intent(this, ForegoundServer.class);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Constant.FINISH_FOREGROUND_ACTIVITY);
+        sendBroadcast(sendIntent);
+
+        Intent intent1 = new Intent(this, ForegroundServer.class);
         stopService(intent1);
     }
 

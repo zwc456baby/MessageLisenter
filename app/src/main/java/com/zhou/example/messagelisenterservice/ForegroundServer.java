@@ -15,7 +15,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-public class ForegoundServer extends Service {
+public class ForegroundServer extends Service {
 
     private final int FOREGROUND_ID = 1996;
 
@@ -42,10 +42,10 @@ public class ForegoundServer extends Service {
     public void onDestroy() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Log.i("ForegoundServer", "stop notification");
-
         if (notificationManager != null) {
             notificationManager.cancel(FOREGROUND_ID);
         }
+
         handler.removeCallbacks(stopServerRunnable);
         super.onDestroy();
     }
@@ -91,7 +91,7 @@ public class ForegoundServer extends Service {
     private Runnable stopServerRunnable = new Runnable() {
         @Override
         public void run() {
-            Intent intent1 = new Intent(ForegoundServer.this, ForegoundServer.class);
+            Intent intent1 = new Intent(ForegroundServer.this, ForegroundServer.class);
             stopService(intent1);
         }
     };
