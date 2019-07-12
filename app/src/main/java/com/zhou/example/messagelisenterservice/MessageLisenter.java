@@ -21,6 +21,8 @@ import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.zhou.netlogutil.NetLogUtil;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -322,6 +324,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 "[" + subText + "]" + "\n";
 
         putStr(writText);
+        if (!TextUtils.isEmpty(config.getNetLogUrl())) {
+            NetLogUtil.log(writText);
+        }
     }
 
     private boolean isEmptyMsg(CharSequence ntTitle, CharSequence ntText, CharSequence subText) {

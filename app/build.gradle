@@ -13,19 +13,21 @@ android {
     }
 
     signingConfigs {
+        Properties properties = new Properties()
+        InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream();
+        properties.load(inputStream)
+
         assembleRelease {
-            storeFile file('Apk_jks.jks')//签名文件路径，
-            //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
-            storePassword KEY_PASS //密码
-            keyAlias KEY_STORE
-            keyPassword KEY_PASS  //密码
+            storeFile file(properties.getProperty("STORE_FILE_NAME"))//签名文件路径，
+            storePassword properties.getProperty("KEY_PASSWORD") //密码
+            keyAlias properties.getProperty("STORE_ALIAS")
+            keyPassword properties.getProperty("KEY_PASSWORD")  //密码
         }
         debugConfig {
-            storeFile file('Apk_jks.jks')//签名文件路径，
-            //keystore的路径通常使用项目根目录的相对路径，但也可以是使用绝对路径，尽管这不推荐
-            storePassword KEY_PASS //密码
-            keyAlias KEY_STORE
-            keyPassword KEY_PASS  //密码
+            storeFile file(properties.getProperty("STORE_FILE_NAME"))//签名文件路径，
+            storePassword properties.getProperty("KEY_PASSWORD") //密码
+            keyAlias properties.getProperty("STORE_ALIAS")
+            keyPassword properties.getProperty("KEY_PASSWORD")  //密码
         }
     }
 
@@ -47,4 +49,6 @@ dependencies {
 //    implementation 'com.android.support:appcompat-v7:26.1.0'
 //    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 //    testImplementation 'junit:junit:4.12'
+    implementation  'com.dhh:websocket2:2.1.4'
+    implementation(name: 'netlogutil-release', ext: 'aar')
 }

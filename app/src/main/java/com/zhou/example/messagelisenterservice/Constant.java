@@ -18,6 +18,9 @@ public class Constant {
     public final static String PAUSE_NOTIFY_TIME_KEY = "pause_notify_time_key";
     public final static String PAUSE_ALL_PAGE_ENABLE_KEY = "pause_all_page_enable_key";
 
+    public final static String NET_LOG_URL_KEY = "net_log_url_key";
+    public final static String ACCOUNT_KEY = "account_key";
+
     public final static String GET_MESSAGE_LENGTH = "get_message_length";
 
     public final static String FINISH_LOCK_SHOW_ACTIVITY = "finish_lock_show_activity";

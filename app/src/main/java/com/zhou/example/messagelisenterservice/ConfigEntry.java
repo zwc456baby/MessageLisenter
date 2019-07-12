@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.zhou.netlogutil.NetLogUtil;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +24,9 @@ public class ConfigEntry {
     private long pauseNotifyTime;
 
     private boolean pauseApplyToAllPage;
+
+    private String netLogUrl;
+    private String account;
 
     private ConfigEntry() {
     }
@@ -44,11 +49,20 @@ public class ConfigEntry {
             loadConfigFromFile(context);
             writeConfigToXml(context);
         }
+
+        InitNetLog();
     }
 
     public void writeConfig(Context context) {
         writeConfigToFile(context);
         writeConfigToXml(context);
+    }
+
+    private void InitNetLog() {
+        NetLogUtil.getConfig().configAccount(account)
+                .configFileName("notifycation.log")
+                .configCrypto(true)
+                .configUrl(netLogUrl);
     }
 
     private String getConfigFilePath(Context context) {
@@ -81,6 +95,8 @@ public class ConfigEntry {
         closePauseNotify = rootJson.optBoolean(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
         pauseNotifyTime = rootJson.optLong(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
         pauseApplyToAllPage = rootJson.optBoolean(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
+        netLogUrl = rootJson.optString(Constant.NET_LOG_URL_KEY, "");
+        account = rootJson.optString(Constant.ACCOUNT_KEY, "");
 
         if (sleepTime < 500) sleepTime = 500;
 
@@ -102,6 +118,8 @@ public class ConfigEntry {
             rootJson.put(Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
             rootJson.put(Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
             rootJson.put(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
+            rootJson.put(Constant.NET_LOG_URL_KEY, netLogUrl);
+            rootJson.put(Constant.ACCOUNT_KEY, account);
 
             fileUtils.putStringToFile(configFilePath, rootJson.toString());
         } catch (JSONException e) {
@@ -120,6 +138,8 @@ public class ConfigEntry {
         closePauseNotify = PreUtils.get(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, false);
         pauseNotifyTime = PreUtils.get(context, Constant.PAUSE_NOTIFY_TIME_KEY, -1);
         pauseApplyToAllPage = PreUtils.get(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
+        netLogUrl = PreUtils.get(context, Constant.NET_LOG_URL_KEY, "");
+        account = PreUtils.get(context, Constant.ACCOUNT_KEY, "");
 
         if (sleepTime < 500) sleepTime = 500;
     }
@@ -142,6 +162,8 @@ public class ConfigEntry {
         PreUtils.put(context, Constant.CLOSE_PAUSE_NOTIFY_ENABLE_KEY, closePauseNotify);
         PreUtils.put(context, Constant.PAUSE_NOTIFY_TIME_KEY, pauseNotifyTime);
         PreUtils.put(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
+        PreUtils.put(context, Constant.NET_LOG_URL_KEY, netLogUrl);
+        PreUtils.put(context, Constant.ACCOUNT_KEY, account);
     }
 
     public void setConfig(Intent intent) {
@@ -161,14 +183,19 @@ public class ConfigEntry {
         long pauseNotifyTime = intent.getLongExtra(Constant.PAUSE_NOTIFY_TIME_KEY, -1);
         boolean pauseApplyToAllPage = intent.getBooleanExtra(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
 
+        String netLogUrl = intent.getStringExtra(Constant.NET_LOG_URL_KEY);
+        String account = intent.getStringExtra(Constant.ACCOUNT_KEY);
+
         setConfig(appPackage, titleFilter, messageFilter,
                 playMusic, zhengDong, cancelable, sleepTime
-                , pauseNotifyEnable, pauseNotifyTime, pauseApplyToAllPage);
+                , pauseNotifyEnable, pauseNotifyTime, pauseApplyToAllPage
+                , netLogUrl, account);
     }
 
     private void setConfig(String packageFilter, String titleFilter, String msgFilter
             , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime
-            , boolean closePauseNotify, long pauseNotifyTime, boolean pauseApplyToAllPage) {
+            , boolean closePauseNotify, long pauseNotifyTime, boolean pauseApplyToAllPage
+            , String netLogUrl, String account) {
         this.packageFilter = packageFilter;
         this.titleFilter = titleFilter;
         this.msgFilter = msgFilter;
@@ -179,6 +206,10 @@ public class ConfigEntry {
         this.closePauseNotify = closePauseNotify;
         this.pauseNotifyTime = pauseNotifyTime;
         this.pauseApplyToAllPage = pauseApplyToAllPage;
+        this.netLogUrl = netLogUrl;
+        this.account = account;
+
+        InitNetLog();
     }
 
     /************              get and se method *****************/
@@ -222,4 +253,11 @@ public class ConfigEntry {
         return pauseApplyToAllPage;
     }
 
+    public String getNetLogUrl() {
+        return netLogUrl;
+    }
+
+    public String getAccount() {
+        return account;
+    }
 }

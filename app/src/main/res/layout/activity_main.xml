@@ -131,6 +131,24 @@
                 android:hint="@string/pause_notify_time_hint"
                 android:inputType="number" />
 
+            <TextView
+                style="@style/setting_edit_text"
+                android:text="@string/net_log_url" />
+
+            <EditText
+                android:id="@+id/netLogEdit"
+                style="@style/setting_edit"
+                android:hint="@string/net_log_url_hint" />
+
+            <TextView
+                style="@style/setting_edit_text"
+                android:text="@string/account" />
+
+            <EditText
+                android:id="@+id/accountEdit"
+                style="@style/setting_edit"
+                android:hint="@string/account_hint" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

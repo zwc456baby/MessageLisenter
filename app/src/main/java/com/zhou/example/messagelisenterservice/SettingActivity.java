@@ -15,7 +15,7 @@ import android.widget.EditText;
 public class SettingActivity extends Activity {
 
 
-    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit;
+    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit, netLogUrlEdit, accountEdit;
 
     private Button startBtn, startSettingBtn;
 
@@ -36,6 +36,8 @@ public class SettingActivity extends Activity {
         messageInEdit = findViewById(R.id.input_message_filter);
         playSleepTime = findViewById(R.id.playSleepTime);
         pauseNotifyEdit = findViewById(R.id.pauseNotifyEdit);
+        netLogUrlEdit = findViewById(R.id.netLogEdit);
+        accountEdit = findViewById(R.id.accountEdit);
 
         startBtn = findViewById(R.id.startBtn);
         startSettingBtn = findViewById(R.id.startSettingBtn);
@@ -55,6 +57,8 @@ public class SettingActivity extends Activity {
         titleInEdit.setText(configEntry.getTitleFilter());
         messageInEdit.setText(configEntry.getMsgFilter());
         playSleepTime.setText(String.valueOf(configEntry.getSleepTime()));
+        netLogUrlEdit.setText(configEntry.getNetLogUrl());
+        accountEdit.setText(configEntry.getAccount());
         pauseNotifyEdit.setText(String.valueOf(configEntry.getPauseNotifyTime() / 60 / 1000));
 
         playMusic.setChecked(configEntry.isPlayMusic());
@@ -90,6 +94,9 @@ public class SettingActivity extends Activity {
         intent.putExtra(Constant.APP_PACKAGE_KEY, appNameEdit.getText().toString());
         intent.putExtra(Constant.TITLE_FILTER_KEY, titleInEdit.getText().toString());
         intent.putExtra(Constant.MESSAGE_FILTER_KEY, messageInEdit.getText().toString());
+        intent.putExtra(Constant.NET_LOG_URL_KEY, netLogUrlEdit.getText().toString());
+        intent.putExtra(Constant.ACCOUNT_KEY, accountEdit.getText().toString());
+
         intent.putExtra(Constant.PLAY_SLEEP_TIME_KEY, playSleepTime.getText().toString());
         intent.putExtra(Constant.PAUSE_NOTIFY_TIME_KEY, Long.valueOf(pauseNotifyEdit.getText().toString()) * 60 * 1000);
 
