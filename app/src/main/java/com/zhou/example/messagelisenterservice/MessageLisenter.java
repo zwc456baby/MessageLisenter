@@ -132,9 +132,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
-        Intent startActivityIntent = new Intent(this, ForegroundActivity.class);
-        startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startActivityIntent);
 
         exitForeground();
         Intent intent = new Intent(this, ForegroundServer.class);
@@ -148,14 +145,26 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     }
 
+    private void enterForegroundActivity() {
+        exitForegroundActivity();
+        Intent startActivityIntent = new Intent(this, ForegroundActivity.class);
+        startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startActivityIntent);
+
+    }
+
     private void exitForeground() {
         Log.i(TAG, "exitForeground");
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Constant.FINISH_FOREGROUND_ACTIVITY);
-        sendBroadcast(sendIntent);
+
 
         Intent intent1 = new Intent(this, ForegroundServer.class);
         stopService(intent1);
+    }
+
+    private void exitForegroundActivity() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Constant.FINISH_FOREGROUND_ACTIVITY);
+        sendBroadcast(sendIntent);
     }
 
     private void checkAllNotify(StatusBarNotification[] notifications) {
@@ -331,6 +340,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(Intent.ACTION_USER_PRESENT);
         filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction(NetLogUtil.RECONNECT_ACTION);
+        filter.addAction(NetLogUtil.CONNECT_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -535,6 +546,17 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 stopPlaySound();
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
                 autoStartNetLog();
+            } else if (NetLogUtil.RECONNECT_ACTION.equals(intent.getAction())) {
+//                enterForegroundActivity();
+                boolean faild = NetLogUtil.EXTERNAL_FAILD.equals(
+                        intent.getStringExtra(NetLogUtil.EXTERNAL_KEY)
+                );
+                if (faild) {
+                    enterForeground();
+                }
+            } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
+                exitForeground();
+//                exitForegroundActivity();
             }
         }
     };
