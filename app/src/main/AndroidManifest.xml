@@ -40,6 +40,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".ForegoundServer"
+            android:exported="false" />
+
         <receiver
             android:name=".StartReceive"
             android:exported="true">

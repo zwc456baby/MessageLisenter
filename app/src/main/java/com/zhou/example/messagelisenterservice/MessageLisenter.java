@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -69,10 +70,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     @Override
     public void onCreate() {
         super.onCreate();
+        enterForeground();
         InitPlay();
         registerHomeBroad();
         reloadConfig();
-
         autoStartNetLog();
     }
 
@@ -103,6 +104,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
+        exitForeground();
         clearNfSbnAndStopSound();
         checkAllNotify(getActiveNotifications());
     }
@@ -119,6 +121,22 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         clearNfSbnAndStopSound();
         unregisterHomeBroad();
         cleanPlay();
+    }
+
+    private void enterForeground() {
+        Intent intent = new Intent(this, ForegoundServer.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+    }
+
+    private void exitForeground() {
+        Intent intent1 = new Intent(this, MessageLisenter.class);
+        stopService(intent1);
     }
 
     private void checkAllNotify(StatusBarNotification[] notifications) {
