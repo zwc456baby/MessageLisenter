@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
 
     <!--android:theme="@android:style/Theme.NoTitleBar">-->
     <application
@@ -40,9 +42,7 @@
             </intent-filter>
         </service>
 
-        <service
-            android:name=".ForegoundServer"
-            android:exported="false" />
+        <service android:name=".ForegoundServer" />
 
         <receiver
             android:name=".StartReceive"

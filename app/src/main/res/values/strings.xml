@@ -23,4 +23,5 @@
     <string name="account">请输入账户</string>
     <string name="account_hint">账户</string>
     <string name="pause_notify_page_text">暂停通知对所有页面生效</string>
+    <string name="wait_service_connect">等待服务连接</string>
 </resources>

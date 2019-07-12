@@ -22,6 +22,7 @@ import android.os.Vibrator;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
@@ -42,7 +43,7 @@ import java.util.Locale;
  */
 
 public class MessageLisenter extends NotificationListenerService implements Handler.Callback {
-
+    private final String TAG = "MessageLisenter";
     private final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 
     private final String dayType = "yyyy-MM-dd HH:mm:ss";
@@ -79,6 +80,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "message listen start command");
         Toast.makeText(this, "启动服务成功", Toast.LENGTH_SHORT).show();
         reloadConfig();
         clearNfSbnAndStopSound();
@@ -88,6 +90,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
+        Log.i(TAG, "message listen post notifycation");
         super.onNotificationPosted(sbn);
         writeNotifyToFile(sbn);
         tryStartPlaySound(sbn);
@@ -96,6 +99,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
+        Log.i(TAG, "message listen remove notifycation");
         super.onNotificationRemoved(sbn);
         tryStopPlaysound(sbn);
     }
@@ -103,7 +107,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public void onListenerConnected() {
+        Log.i(TAG, "message listen connect");
         super.onListenerConnected();
+
         exitForeground();
         clearNfSbnAndStopSound();
         checkAllNotify(getActiveNotifications());
@@ -111,12 +117,14 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public void onListenerDisconnected() {
+        Log.i(TAG, "message listen disconnect");
         super.onListenerDisconnected();
         clearNfSbnAndStopSound();
     }
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "message listen server destroy");
         super.onDestroy();
         clearNfSbnAndStopSound();
         unregisterHomeBroad();
@@ -124,18 +132,30 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
-        Intent intent = new Intent(this, ForegoundServer.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        Intent startActivityIntent = new Intent(this, ForegoundActivity.class);
+//        startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//        startActivity(startActivityIntent);
+        try {
+            exitForeground();
+            Intent intent = new Intent(this, ForegoundServer.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
+        } catch (Exception ignore) {
         }
     }
 
     private void exitForeground() {
-        Intent intent1 = new Intent(this, MessageLisenter.class);
+//        Intent sendIntent = new Intent();
+//        sendIntent.setAction(Constant.FINISH_FOREGROUND_ACTIVITY);
+//        sendBroadcast(sendIntent);
+        Log.i(TAG, "exitForeground");
+        Intent intent1 = new Intent(this, ForegoundServer.class);
         stopService(intent1);
     }
 
