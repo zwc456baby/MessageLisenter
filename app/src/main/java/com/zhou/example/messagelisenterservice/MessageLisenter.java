@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -70,6 +72,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         InitPlay();
         registerHomeBroad();
         reloadConfig();
+
+        autoStartNetLog();
     }
 
     @Override
@@ -289,6 +293,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_USER_PRESENT);
         filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -399,6 +404,28 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         pm = null;
     }
 
+    /**
+     * 自动判断并启动网络日志
+     */
+    private void autoStartNetLog() {
+        if (getNetIsConnect()) {
+            NetLogUtil.resume();
+        } else {
+            NetLogUtil.pause();
+        }
+    }
+
+    private boolean getNetIsConnect() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this
+                .getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo info = null;
+        if (connectivityManager != null) {
+            info = connectivityManager.getActiveNetworkInfo();
+        }
+        return info != null
+                && info.getState() == NetworkInfo.State.CONNECTED;
+    }
+
     @Override
     public boolean handleMessage(Message msg) {
         if (!(battery > 15)) {
@@ -469,6 +496,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound();
+            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                autoStartNetLog();
             }
         }
     };

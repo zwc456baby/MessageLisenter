@@ -33,16 +33,17 @@ public class StartReceive extends BroadcastReceiver {
                 return;
             }
             ConfigEntry configEntry = ConfigEntry.getInstance();
-            
             configEntry.setConfig(intent);
             configEntry.writeConfig(context);
-        }
-        Intent intent1 = new Intent(context, MessageLisenter.class);
-        context.stopService(intent1);
 
-        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startService(intent1);
-        toggleNotificationListenerService(context);
+            Intent intent1 = new Intent(context, MessageLisenter.class);
+            context.stopService(intent1);
+
+            intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startService(intent1);
+            toggleNotificationListenerService(context);
+        }
+
     }
 
     private void killProcess() {
