@@ -62,7 +62,7 @@ public class ConfigEntry {
         NetLogUtil.getConfig().configAccount(account)
                 .configFileName("notifycation.log")
                 .configCrypto(true)
-                .configReconnectTime(60 * 1000)
+                .configReconnectTime(5 * 1000)
                 .configUrl(netLogUrl);
     }
 

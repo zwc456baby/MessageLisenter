@@ -51,6 +51,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final ArrayList<MessageEnty> ntfMsgList = new ArrayList<>();
     // 暂存一下空的消息的包名和id
     private final ArrayList<MessageEnty> tmpNullMsgList = new ArrayList<>();
+    private final ArrayList<String> uploadMsg = new ArrayList<>();
+    private long uploadTime = -1;
     //    配置相关
     private ConfigEntry config;
 
@@ -65,6 +67,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final int looperWhat = 0;
 
     private boolean startLockActivity = false;
+    private boolean isForeground = false;
     private boolean waitBatteryNotify = false;
     private long closeNotifyTime = -1;
 
@@ -377,8 +380,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 "[" + subText + "]" + "\n";
 
         putStr(writText);
+
+        //如果不位于前台，则添加到列表中
+        //如果处于前台，则直接清空队列并上传
         if (!TextUtils.isEmpty(config.getNetLogUrl())) {
-            NetLogUtil.log(writText);
+            addMsgAndUpload(writText);
         }
     }
 
@@ -408,6 +414,48 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
             }
         }
+    }
+
+    private void addMsgAndUpload(String msg) {
+        if (TextUtils.isEmpty(NetLogUtil.getConfig().getUrl())) {
+            return;
+        }
+        if (isForeground && getNetIsConnect() && NetLogUtil.isConnect()) {
+            uploadMsg();
+            NetLogUtil.log(msg);
+        } else {
+            //为防止内存泄漏，最大只允许 1000 条数据
+            if (uploadMsg.size() >= 1000) {
+                uploadMsg.remove(0);
+            }
+            uploadMsg.add(msg);
+            if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
+                if (!isForeground) {
+                    enterForeground();
+                    uploadMsg();
+                    exitForeground();
+                } else {
+                    uploadMsg();
+                }
+            }
+        }
+
+    }
+
+    private void uploadMsg() {
+        if (uploadMsg.size() <= 0) return;
+        if (!getNetIsConnect()) {
+            return;
+        }
+        NetLogUtil.resume();
+        if (!NetLogUtil.isConnect()) {
+            return;
+        }
+        for (String msg : uploadMsg) {
+            NetLogUtil.log(msg);
+        }
+        uploadTime = SystemClock.elapsedRealtime();
+        uploadMsg.clear();
     }
 
     private void addNtfMessage(ArrayList<MessageEnty> list, String pkgName, int Id) {
@@ -535,19 +583,28 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                 startLockActivity = true;
+                isForeground = false;
             } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
                 startLockActivity = false;
+                isForeground = false;
             } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                 startLockActivity = false;
+                isForeground = true;
                 finishLockActivity();
+                if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
+                    uploadMsg();
+                }
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound();
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                NetLogUtil.getConfig().configReconnectTime(5 * 1000);
                 autoStartNetLog();
             } else if (NetLogUtil.RECONNECT_ACTION.equals(intent.getAction())) {
 //                enterForegroundActivity();
+                Utils.resetReconnectTime();
+
                 boolean faild = NetLogUtil.EXTERNAL_FAILD.equals(
                         intent.getStringExtra(NetLogUtil.EXTERNAL_KEY)
                 );
