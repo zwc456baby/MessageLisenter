@@ -67,7 +67,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final int looperWhat = 0;
 
     private boolean startLockActivity = false;
-    private boolean isForeground = false;
+    private boolean isForeground = true;
     private boolean waitBatteryNotify = false;
     private long closeNotifyTime = -1;
 
