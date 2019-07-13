@@ -40,12 +40,12 @@ public class ForegroundServer extends Service {
             setForegroundService();
         }
         registerFinishBroad();
-        handler.removeCallbacks(stopServerRunnable);
-        handler.postDelayed(stopServerRunnable, MAX_SHOW_TIME);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        handler.removeCallbacks(stopServerRunnable);
+        handler.postDelayed(stopServerRunnable, MAX_SHOW_TIME);
         return super.onStartCommand(intent, flags, startId);
     }
 

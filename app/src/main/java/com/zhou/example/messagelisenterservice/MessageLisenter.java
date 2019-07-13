@@ -399,9 +399,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             uploadMsg();
         } else {
             if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-                enterForeground();
                 uploadMsg();
-                exitForeground();
             }
         }
         //为防止内存泄漏，最大只允许 100 条数据
@@ -593,6 +591,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
             } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive socket connect action");
+                if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
+                    uploadMsg();
+                }
                 exitForeground();
 //                exitForegroundActivity();
             }
