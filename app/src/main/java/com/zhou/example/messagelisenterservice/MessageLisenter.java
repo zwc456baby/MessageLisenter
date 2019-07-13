@@ -122,6 +122,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     public void onListenerDisconnected() {
         Log.i(TAG, "message listen disconnect");
         super.onListenerDisconnected();
+        uploadMsg();
         clearNfSbnAndStopSound();
     }
 
@@ -129,6 +130,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     public void onDestroy() {
         Log.i(TAG, "message listen server destroy");
         super.onDestroy();
+        uploadMsg();
         clearNfSbnAndStopSound();
         unregisterHomeBroad();
         cleanPlay();
