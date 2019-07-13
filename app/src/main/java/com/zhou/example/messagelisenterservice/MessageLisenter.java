@@ -422,17 +422,13 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void addMsgAndUpload(String msg) {
         uploadMsg.add(msg);
-        if (isForeground && getNetIsConnect() && NetLogUtil.isConnect()) {
+        if (isForeground) {
             uploadMsg();
         } else {
             if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-                if (!isForeground) {
-                    enterForeground();
-                    uploadMsg();
-                    exitForeground();
-                } else {
-                    uploadMsg();
-                }
+                enterForeground();
+                uploadMsg();
+                exitForeground();
             }
         }
         //为防止内存泄漏，最大只允许 100 条数据
