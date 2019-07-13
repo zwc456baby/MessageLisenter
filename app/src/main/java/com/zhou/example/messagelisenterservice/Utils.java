@@ -24,7 +24,7 @@ public class Utils {
 
     public static boolean needUpload(int size, long time) {
         //如果长度大于 1000 必须上传
-        if (size > 100) return true;
+        if (size >= 100) return true;
         //如果时间超过两小时，必须上传
         if ((SystemClock.elapsedRealtime() - time) > 2 * 60 * 60 * 1000
                 && size > 0) return true;
@@ -33,6 +33,6 @@ public class Utils {
         temp += size;
         temp += (((SystemClock.elapsedRealtime() - time) / (6 * 1000)) / 12);
 
-        return temp > 100;
+        return temp >= 100;
     }
 }

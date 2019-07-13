@@ -424,10 +424,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             uploadMsg();
             NetLogUtil.log(msg);
         } else {
-            //为防止内存泄漏，最大只允许 100 条数据
-            if (uploadMsg.size() >= 100) {
-                uploadMsg.remove(0);
-            }
             uploadMsg.add(msg);
             if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
                 if (!isForeground) {
@@ -438,6 +434,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     uploadMsg();
                 }
             }
+            //为防止内存泄漏，最大只允许 100 条数据
+            if (uploadMsg.size() >= 100) {
+                uploadMsg.remove(0);
+            }
+
         }
 
     }
