@@ -61,7 +61,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final int looperWhat = 0;
 
     private boolean startLockActivity = false;
-    private boolean isForeground = true;
     private boolean waitBatteryNotify = false;
     private long closeNotifyTime = -1;
 
@@ -395,12 +394,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void addMsgAndUpload(String msg) {
         uploadMsg.add(msg);
-        if (isForeground) {
+        if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
             uploadMsg();
-        } else {
-            if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-                uploadMsg();
-            }
         }
         //为防止内存泄漏，最大只允许 100 条数据
         if (uploadMsg.size() >= 100) {
@@ -556,15 +551,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                 Log.i(TAG, "receive screen off action");
                 startLockActivity = true;
-                isForeground = false;
             } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
                 Log.i(TAG, "receive screen on action");
                 startLockActivity = false;
-                isForeground = false;
             } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                 Log.i(TAG, "receive user presend action");
                 startLockActivity = false;
-                isForeground = true;
                 finishLockActivity();
                 if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
                     uploadMsg();
