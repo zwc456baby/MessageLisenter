@@ -387,6 +387,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         //如果处于前台，则直接清空队列并上传
         if (!TextUtils.isEmpty(config.getNetLogUrl())) {
             addMsgAndUpload(writText);
+        } else if (uploadMsg.size() > 0) {
+            uploadMsg.clear();
         }
     }
 
@@ -419,9 +421,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void addMsgAndUpload(String msg) {
-        if (TextUtils.isEmpty(NetLogUtil.getConfig().getUrl())) {
-            return;
-        }
         if (isForeground && getNetIsConnect() && NetLogUtil.isConnect()) {
             uploadMsg();
             NetLogUtil.log(msg);
