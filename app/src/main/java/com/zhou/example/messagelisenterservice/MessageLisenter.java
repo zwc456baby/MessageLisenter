@@ -568,7 +568,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 stopPlaySound();
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive net connect change action");
-                NetLogUtil.getConfig().configReconnectTime(5 * 1000);
                 autoStartNetLog();
             } else if (NetLogUtil.RECONNECT_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive socket reconnect action");
@@ -583,6 +582,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
             } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive socket connect action");
+                NetLogUtil.getConfig().configReconnectTime(5 * 1000);
                 if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
                     uploadMsg();
                 }
