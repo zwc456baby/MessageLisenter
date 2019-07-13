@@ -27,10 +27,7 @@ import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,7 +41,6 @@ import java.util.Locale;
 
 public class MessageLisenter extends NotificationListenerService implements Handler.Callback {
     private final String TAG = "MessageLisenter";
-    private final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
 
     private final String dayType = "yyyy-MM-dd HH:mm:ss";
     private final DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
@@ -356,7 +352,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void writeNotifyToFile(StatusBarNotification sbn) {
         //            具有写入权限，否则不写入
-        if (!notifycationFilePath.canWrite()) return;
+        if (Utils.canWrite()) return;
         CharSequence notificationTitle = null;
         CharSequence notificationText = null;
         CharSequence subText = null;
@@ -381,7 +377,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +
                 "[" + subText + "]" + "\n";
 
-        putStr(writText);
+        Utils.putStr(writText);
 
         //如果不位于前台，则添加到列表中
         //如果处于前台，则直接清空队列并上传
@@ -396,28 +392,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         return TextUtils.isEmpty(ntTitle)
                 && TextUtils.isEmpty(ntText)
                 && TextUtils.isEmpty(subText);
-    }
-
-
-    private void putStr(String value) {
-        String notifycationFileName = "notifycation_file.txt";
-        File file = new File(notifycationFilePath, notifycationFileName);
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(file, true), 1024);
-            out.write(value);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (out != null) {
-                try {
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     private void addMsgAndUpload(String msg) {

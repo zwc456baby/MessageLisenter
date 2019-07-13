@@ -1,8 +1,14 @@
 package com.zhou.example.messagelisenterservice;
 
+import android.os.Environment;
 import android.os.SystemClock;
 
 import com.zhou.netlogutil.NetLogUtil;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Utils {
 
@@ -34,5 +40,35 @@ public class Utils {
         temp += (((SystemClock.elapsedRealtime() - time) / (6 * 1000)) / 12);
 
         return temp >= 100;
+    }
+
+    private static final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+
+
+    public static void putStr(String value) {
+        if (canWrite()) return;
+
+        String notifycationFileName = "notifycation_file.txt";
+        File file = new File(notifycationFilePath, notifycationFileName);
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new FileWriter(file, true), 1024);
+            out.write(value);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                try {
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static boolean canWrite() {
+        return notifycationFilePath.canWrite();
     }
 }
