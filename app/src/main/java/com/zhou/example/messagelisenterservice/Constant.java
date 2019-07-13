@@ -27,6 +27,7 @@ public class Constant {
     public final static String FINISH_LOCK_SHOW_ACTIVITY = "finish_lock_show_activity";
     public final static String UPDATA_MESSAGE_DATA_ACTION = "updata_message_data_action";
     public final static String CLOSE_ACTIVITY_STOP_NOTIFY_ACTION = "close_activity_stop_notify_action";
+    public final static String FINISH_FOREGROUND_SERVICE = "finish_foreground_service";
 
 
     public static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";

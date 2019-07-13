@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +38,7 @@ import java.util.Locale;
  */
 
 public class MessageLisenter extends NotificationListenerService implements Handler.Callback {
-    private final String TAG = "MessageLisenter";
+    private final String TAG = "LogUtils";
 
     private final String dayType = "yyyy-MM-dd HH:mm:ss";
     private final DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
@@ -133,8 +131,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
-
         exitForeground();
+
+        Log.i(TAG, "enter fore ground");
         Intent intent = new Intent(this, ForegroundServer.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -157,9 +156,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void exitForeground() {
         Log.i(TAG, "exitForeground");
 
-
-        Intent intent1 = new Intent(this, ForegroundServer.class);
-        stopService(intent1);
+        Intent intent1 = new Intent();
+        intent1.setAction(Constant.FINISH_FOREGROUND_SERVICE);
+        sendBroadcast(intent1);
     }
 
     private void exitForegroundActivity() {
@@ -351,6 +350,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void writeNotifyToFile(StatusBarNotification sbn) {
+        Log.i(TAG, "write notify message to file");
         //            具有写入权限，否则不写入
         if (Utils.canWrite()) return;
         CharSequence notificationTitle = null;
@@ -475,8 +475,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
      */
     private void autoStartNetLog() {
         if (getNetIsConnect()) {
+            Log.i(TAG, "resume ");
             NetLogUtil.resume();
+            Log.i(TAG, "resume end");
         } else {
+            Log.i(TAG, "pause ");
             NetLogUtil.pause();
         }
     }
@@ -532,6 +535,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
+                Log.i(TAG, "receive close system dialog action");
                 if (clickTime > SystemClock.elapsedRealtime() - 1000)
                     clickCount++;
                 else
@@ -543,6 +547,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     Toast.makeText(context, "消息监听服务运行中", Toast.LENGTH_SHORT).show();
                 }
             } else if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                Log.i(TAG, "receive bettery change action");
                 battery = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 100);
                 if (!waitBatteryNotify)
                     return;
@@ -552,12 +557,15 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     startPlaySound();
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+                Log.i(TAG, "receive screen off action");
                 startLockActivity = true;
                 isForeground = false;
             } else if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                Log.i(TAG, "receive screen on action");
                 startLockActivity = false;
                 isForeground = false;
             } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+                Log.i(TAG, "receive user presend action");
                 startLockActivity = false;
                 isForeground = true;
                 finishLockActivity();
@@ -565,13 +573,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     uploadMsg();
                 }
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
+                Log.i(TAG, "receive close activity action");
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound();
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                Log.i(TAG, "receive net connect change action");
                 NetLogUtil.getConfig().configReconnectTime(5 * 1000);
                 autoStartNetLog();
             } else if (NetLogUtil.RECONNECT_ACTION.equals(intent.getAction())) {
+                Log.i(TAG, "receive socket reconnect action");
 //                enterForegroundActivity();
                 Utils.resetReconnectTime();
 
@@ -582,6 +593,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     enterForeground();
                 }
             } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
+                Log.i(TAG, "receive socket connect action");
                 exitForeground();
 //                exitForegroundActivity();
             }

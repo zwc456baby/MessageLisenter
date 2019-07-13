@@ -6,45 +6,57 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class ForegroundServer extends Service {
 
-    private final int FOREGROUND_ID = 1996;
+    private final int FOREGROUND_ID = 1;
 
     private final String channel_name = "ForegoundServer";
     private final String CHANNEL_ID = "service";
 
     private Handler handler = new Handler(Looper.getMainLooper());
 
+    private final long MIN_SHOW_TIME = 2000;
+    private final long MAX_SHOW_TIME = 10000;
+
+    private long enterTime;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        handler.postDelayed(stopServerRunnable, 4000);
+        enterTime = SystemClock.elapsedRealtime();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            setForegroundService();
+        }
+        registerFinishBroad();
+        handler.removeCallbacks(stopServerRunnable);
+        handler.postDelayed(stopServerRunnable, MAX_SHOW_TIME);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            setForegroundService();
-        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
+        unregisterFinishBroad();
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Log.i("ForegoundServer", "stop notification");
         if (notificationManager != null) {
             notificationManager.cancel(FOREGROUND_ID);
         }
-
         handler.removeCallbacks(stopServerRunnable);
         super.onDestroy();
     }
@@ -79,7 +91,7 @@ public class ForegroundServer extends Service {
                 .build();//设置处于运行状态
 
         Intent notificationIntent = new Intent(getApplicationContext(), SettingActivity.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         notification.contentIntent = PendingIntent.getActivity(getApplicationContext(),
                 0, notificationIntent, 0);
@@ -87,11 +99,39 @@ public class ForegroundServer extends Service {
         startForeground(FOREGROUND_ID, notification);
     }
 
+    private void registerFinishBroad() {
+        IntentFilter filter = new IntentFilter(Constant.FINISH_FOREGROUND_SERVICE);
+        registerReceiver(finishServiceBroadcast, filter);
+    }
+
+    private void unregisterFinishBroad() {
+        try {
+            this.unregisterReceiver(finishServiceBroadcast);
+        } catch (Exception ignore) {
+        }
+    }
+
     private Runnable stopServerRunnable = new Runnable() {
         @Override
         public void run() {
             Intent intent1 = new Intent(ForegroundServer.this, ForegroundServer.class);
             stopService(intent1);
+        }
+    };
+
+    private BroadcastReceiver finishServiceBroadcast = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Constant.FINISH_FOREGROUND_SERVICE.equals(intent.getAction())) {
+                long temp = SystemClock.elapsedRealtime() - enterTime;
+                handler.removeCallbacks(stopServerRunnable);
+                if (temp > MIN_SHOW_TIME) {
+                    handler.post(stopServerRunnable);
+                } else {
+                    handler.postDelayed(stopServerRunnable, MIN_SHOW_TIME - temp);
+                }
+            }
         }
     };
 
