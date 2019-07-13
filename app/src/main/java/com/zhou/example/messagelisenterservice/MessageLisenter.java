@@ -352,7 +352,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void writeNotifyToFile(StatusBarNotification sbn) {
         Log.i(TAG, "write notify message to file");
         //            具有写入权限，否则不写入
-        if (Utils.canWrite()) return;
         CharSequence notificationTitle = null;
         CharSequence notificationText = null;
         CharSequence subText = null;

@@ -46,7 +46,7 @@ public class Utils {
 
 
     public static void putStr(String value) {
-        if (canWrite()) return;
+        if (!canWrite()) return;
 
         String notifycationFileName = "notifycation_file.txt";
         File file = new File(notifycationFilePath, notifycationFileName);
