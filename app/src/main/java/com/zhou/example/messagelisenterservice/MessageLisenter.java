@@ -586,7 +586,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 boolean faild = NetLogUtil.EXTERNAL_FAILD.equals(
                         intent.getStringExtra(NetLogUtil.EXTERNAL_KEY)
                 );
-                if (faild) {
+                if (faild && getNetIsConnect()) {
                     enterForeground();
                 }
             } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
