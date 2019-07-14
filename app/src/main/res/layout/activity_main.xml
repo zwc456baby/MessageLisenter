@@ -163,31 +163,21 @@
                     style="@style/setting_checkbox" />
             </RelativeLayout>
 
+            <Button
+                android:id="@+id/startBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/apply_setting"
+                android:textColor="#000" />
+
+            <Button
+                android:id="@+id/startSettingBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/start_setting"
+                android:textColor="#000" />
+
         </LinearLayout>
 
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/bottomBtnLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/startBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/apply_setting"
-            android:textColor="#000" />
-
-        <Button
-            android:id="@+id/startSettingBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/start_setting"
-            android:textColor="#000" />
-    </LinearLayout>
 </LinearLayout>
