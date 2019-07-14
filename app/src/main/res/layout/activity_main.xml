@@ -1,183 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="0dp"
     android:background="#fff"
-    android:orientation="vertical"
-    tools:context="com.zhou.example.messagelisenterservice.SettingActivity">
+    android:padding="0dp"
+    android:scrollbarStyle="insideInset">
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <!--<ScrollView-->
+    <!--android:id="@+id/scrollView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:scrollbarStyle="insideInset">-->
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="20dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="0dp"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            style="@style/setting_edit_text"
+            android:layout_marginTop="50dp"
+            android:text="@string/input_app_name" />
+
+        <EditText
+            android:id="@+id/input_app_name"
+            style="@style/setting_edit"
+            android:hint="@string/input_app_name" />
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/input_title_filter" />
+
+        <EditText
+            android:id="@+id/input_title_filter"
+            style="@style/setting_edit"
+            android:hint="@string/input_title_filter" />
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/input_message_filter" />
+
+        <EditText
+            android:id="@+id/input_message_filter"
+            style="@style/setting_edit"
+            android:hint="@string/input_message_filter" />
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/play_sleep_time" />
+
+        <EditText
+            android:id="@+id/playSleepTime"
+            style="@style/setting_edit"
+            android:inputType="number"
+            android:text="@string/sleep_time" />
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/setting_checkbox_text"
+                android:layout_alignStart="@id/playMusicCheck"
+                android:text="@string/play_music" />
+
+            <CheckBox
+                android:id="@+id/playMusicCheck"
+                style="@style/setting_checkbox" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/setting_checkbox_text"
+                android:layout_alignStart="@id/zhendongCheck"
+                android:text="@string/zheng_dong" />
+
+            <CheckBox
+                android:id="@+id/zhendongCheck"
+                style="@style/setting_checkbox" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/setting_checkbox_text"
+                android:layout_alignStart="@id/containsServiceCheck"
+                android:text="@string/contains_service" />
+
+            <CheckBox
+                android:id="@+id/containsServiceCheck"
+                style="@style/setting_checkbox" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/setting_checkbox_text"
+                android:layout_alignStart="@id/pauseNotifyCheck"
+                android:text="@string/pause_notify_time" />
+
+            <CheckBox
+                android:id="@+id/pauseNotifyCheck"
+                style="@style/setting_checkbox" />
+        </RelativeLayout>
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/pause_notify_time_hint" />
+
+        <EditText
+            android:id="@+id/pauseNotifyEdit"
+            style="@style/setting_edit"
+            android:hint="@string/pause_notify_time_hint"
+            android:inputType="number" />
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/net_log_url" />
+
+        <EditText
+            android:id="@+id/netLogEdit"
+            style="@style/setting_edit"
+            android:hint="@string/net_log_url_hint" />
+
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/account" />
+
+        <EditText
+            android:id="@+id/accountEdit"
+            style="@style/setting_edit"
+            android:hint="@string/account_hint" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/setting_checkbox_text"
+                android:layout_alignStart="@id/pauseApplyToAllPageCheck"
+                android:text="@string/pause_notify_page_text" />
+
+            <CheckBox
+                android:id="@+id/pauseApplyToAllPageCheck"
+                style="@style/setting_checkbox" />
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/startBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical">
+            android:text="@string/apply_setting"
+            android:textColor="#000" />
 
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/input_app_name" />
+        <Button
+            android:id="@+id/startSettingBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start_setting"
+            android:textColor="#000" />
 
-            <EditText
-                android:id="@+id/input_app_name"
-                style="@style/setting_edit"
-                android:hint="@string/input_app_name" />
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/input_title_filter" />
-
-            <EditText
-                android:id="@+id/input_title_filter"
-                style="@style/setting_edit"
-                android:hint="@string/input_title_filter" />
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/input_message_filter" />
-
-            <EditText
-                android:id="@+id/input_message_filter"
-                style="@style/setting_edit"
-                android:hint="@string/input_message_filter" />
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/play_sleep_time" />
-
-            <EditText
-                android:id="@+id/playSleepTime"
-                style="@style/setting_edit"
-                android:inputType="number"
-                android:text="@string/sleep_time" />
-
-            <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/playMusicCheck"
-                    android:text="@string/play_music" />
-
-                <CheckBox
-                    android:id="@+id/playMusicCheck"
-                    style="@style/setting_checkbox" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/zhendongCheck"
-                    android:text="@string/zheng_dong" />
-
-                <CheckBox
-                    android:id="@+id/zhendongCheck"
-                    style="@style/setting_checkbox" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/containsServiceCheck"
-                    android:text="@string/contains_service" />
-
-                <CheckBox
-                    android:id="@+id/containsServiceCheck"
-                    style="@style/setting_checkbox" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/pauseNotifyCheck"
-                    android:text="@string/pause_notify_time" />
-
-                <CheckBox
-                    android:id="@+id/pauseNotifyCheck"
-                    style="@style/setting_checkbox" />
-            </RelativeLayout>
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/pause_notify_time_hint" />
-
-            <EditText
-                android:id="@+id/pauseNotifyEdit"
-                style="@style/setting_edit"
-                android:hint="@string/pause_notify_time_hint"
-                android:inputType="number" />
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/net_log_url" />
-
-            <EditText
-                android:id="@+id/netLogEdit"
-                style="@style/setting_edit"
-                android:hint="@string/net_log_url_hint" />
-
-            <TextView
-                style="@style/setting_edit_text"
-                android:text="@string/account" />
-
-            <EditText
-                android:id="@+id/accountEdit"
-                style="@style/setting_edit"
-                android:hint="@string/account_hint" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    style="@style/setting_checkbox_text"
-                    android:layout_alignStart="@id/pauseApplyToAllPageCheck"
-                    android:text="@string/pause_notify_page_text" />
-
-                <CheckBox
-                    android:id="@+id/pauseApplyToAllPageCheck"
-                    style="@style/setting_checkbox" />
-            </RelativeLayout>
-
-            <Button
-                android:id="@+id/startBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/apply_setting"
-                android:textColor="#000" />
-
-            <Button
-                android:id="@+id/startSettingBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/start_setting"
-                android:textColor="#000" />
-
-        </LinearLayout>
-
-    </ScrollView>
-</LinearLayout>
+    </LinearLayout>
+    <!--</ScrollView>-->
+</ScrollView>
