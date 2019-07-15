@@ -16,13 +16,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_margin="0dp"
+        android:gravity="center_vertical"
         android:orientation="vertical">
 
         <TextView
             style="@style/setting_edit_text"
-            android:layout_marginTop="50dp"
             android:text="@string/input_app_name" />
 
         <EditText
