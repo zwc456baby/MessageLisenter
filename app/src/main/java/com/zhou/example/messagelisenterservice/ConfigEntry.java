@@ -27,6 +27,7 @@ public class ConfigEntry {
 
     private String netLogUrl;
     private String account;
+    private String passwd;
 
     private ConfigEntry() {
     }
@@ -63,6 +64,7 @@ public class ConfigEntry {
                 .configFileName("notifycation.log")
                 .configCrypto(true)
                 .configReconnectTime(5 * 1000)
+                .configAESKey(passwd)
                 .configUrl(netLogUrl);
     }
 
@@ -98,6 +100,7 @@ public class ConfigEntry {
         pauseApplyToAllPage = rootJson.optBoolean(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
         netLogUrl = rootJson.optString(Constant.NET_LOG_URL_KEY, "");
         account = rootJson.optString(Constant.ACCOUNT_KEY, "");
+        passwd = rootJson.optString(Constant.PASSWD_KEY, "");
 
         if (sleepTime < 500) sleepTime = 500;
 
@@ -121,6 +124,7 @@ public class ConfigEntry {
             rootJson.put(Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
             rootJson.put(Constant.NET_LOG_URL_KEY, netLogUrl);
             rootJson.put(Constant.ACCOUNT_KEY, account);
+            rootJson.put(Constant.PASSWD_KEY, passwd);
 
             fileUtils.putStringToFile(configFilePath, rootJson.toString());
         } catch (JSONException e) {
@@ -141,6 +145,7 @@ public class ConfigEntry {
         pauseApplyToAllPage = PreUtils.get(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, false);
         netLogUrl = PreUtils.get(context, Constant.NET_LOG_URL_KEY, "");
         account = PreUtils.get(context, Constant.ACCOUNT_KEY, "");
+        passwd = PreUtils.get(context, Constant.PASSWD_KEY, "");
 
         if (sleepTime < 500) sleepTime = 500;
     }
@@ -165,6 +170,7 @@ public class ConfigEntry {
         PreUtils.put(context, Constant.PAUSE_ALL_PAGE_ENABLE_KEY, pauseApplyToAllPage);
         PreUtils.put(context, Constant.NET_LOG_URL_KEY, netLogUrl);
         PreUtils.put(context, Constant.ACCOUNT_KEY, account);
+        PreUtils.put(context, Constant.PASSWD_KEY, passwd);
     }
 
     public void setConfig(Intent intent) {
@@ -186,17 +192,18 @@ public class ConfigEntry {
 
         String netLogUrl = intent.getStringExtra(Constant.NET_LOG_URL_KEY);
         String account = intent.getStringExtra(Constant.ACCOUNT_KEY);
+        String passwd = intent.getStringExtra(Constant.PASSWD_KEY);
 
         setConfig(appPackage, titleFilter, messageFilter,
                 playMusic, zhengDong, cancelable, sleepTime
                 , pauseNotifyEnable, pauseNotifyTime, pauseApplyToAllPage
-                , netLogUrl, account);
+                , netLogUrl, account, passwd);
     }
 
     private void setConfig(String packageFilter, String titleFilter, String msgFilter
             , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime
             , boolean closePauseNotify, long pauseNotifyTime, boolean pauseApplyToAllPage
-            , String netLogUrl, String account) {
+            , String netLogUrl, String account, String passwd) {
         this.packageFilter = packageFilter;
         this.titleFilter = titleFilter;
         this.msgFilter = msgFilter;
@@ -209,6 +216,7 @@ public class ConfigEntry {
         this.pauseApplyToAllPage = pauseApplyToAllPage;
         this.netLogUrl = netLogUrl;
         this.account = account;
+        this.passwd = passwd;
 
         InitNetLog();
     }
@@ -260,5 +268,9 @@ public class ConfigEntry {
 
     public String getAccount() {
         return account;
+    }
+
+    public String getPasswd() {
+        return passwd;
     }
 }

@@ -15,7 +15,7 @@ import android.widget.EditText;
 public class SettingActivity extends Activity {
 
 
-    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit, netLogUrlEdit, accountEdit;
+    private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit, netLogUrlEdit, accountEdit, passwdEdit;
 
     private Button startBtn, startSettingBtn;
 
@@ -38,6 +38,7 @@ public class SettingActivity extends Activity {
         pauseNotifyEdit = findViewById(R.id.pauseNotifyEdit);
         netLogUrlEdit = findViewById(R.id.netLogEdit);
         accountEdit = findViewById(R.id.accountEdit);
+        passwdEdit = findViewById(R.id.passwdEdit);
 
         startBtn = findViewById(R.id.startBtn);
         startSettingBtn = findViewById(R.id.startSettingBtn);
@@ -59,6 +60,7 @@ public class SettingActivity extends Activity {
         playSleepTime.setText(String.valueOf(configEntry.getSleepTime()));
         netLogUrlEdit.setText(configEntry.getNetLogUrl());
         accountEdit.setText(configEntry.getAccount());
+        passwdEdit.setText(configEntry.getPasswd());
         pauseNotifyEdit.setText(String.valueOf(configEntry.getPauseNotifyTime() / 60 / 1000));
 
         playMusic.setChecked(configEntry.isPlayMusic());
@@ -96,6 +98,7 @@ public class SettingActivity extends Activity {
         intent.putExtra(Constant.MESSAGE_FILTER_KEY, messageInEdit.getText().toString());
         intent.putExtra(Constant.NET_LOG_URL_KEY, netLogUrlEdit.getText().toString());
         intent.putExtra(Constant.ACCOUNT_KEY, accountEdit.getText().toString());
+        intent.putExtra(Constant.PASSWD_KEY, passwdEdit.getText().toString());
 
         intent.putExtra(Constant.PLAY_SLEEP_TIME_KEY, playSleepTime.getText().toString());
         intent.putExtra(Constant.PAUSE_NOTIFY_TIME_KEY, Long.valueOf(pauseNotifyEdit.getText().toString()) * 60 * 1000);

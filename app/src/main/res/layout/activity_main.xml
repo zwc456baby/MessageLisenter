@@ -147,6 +147,15 @@
             style="@style/setting_edit"
             android:hint="@string/account_hint" />
 
+        <TextView
+            style="@style/setting_edit_text"
+            android:text="@string/passwd_tip" />
+
+        <EditText
+            android:id="@+id/passwdEdit"
+            style="@style/setting_edit"
+            android:hint="@string/passwd" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
