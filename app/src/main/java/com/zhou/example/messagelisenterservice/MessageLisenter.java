@@ -305,6 +305,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         try {
             JSONObject jsonObject = new JSONObject(message);
             String account = jsonObject.getString("account");
+            if (TextUtils.isEmpty(account) || !account.equals(config.getAccount())) {
+                return;
+            }
             String title = jsonObject.getString("title");
             String text = jsonObject.getString("text");
             String showTvText = String.format("%s\n%s\n%s", account, title, text);
@@ -312,10 +315,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
             startActivity(intent);
+            //            其它消息不受限制
+            closeNotifyTime = -1;
+            startPlaySound();
         } catch (JSONException e) {
             e.printStackTrace();
-        } finally {
-            startPlaySound();
         }
     }
 

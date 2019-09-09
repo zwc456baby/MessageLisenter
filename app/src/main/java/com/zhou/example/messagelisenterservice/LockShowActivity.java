@@ -73,6 +73,12 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        sendPauseNotifyBroadcast();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterBroadCast();
@@ -83,7 +89,9 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Constant.FINISH_LOCK_SHOW_ACTIVITY.equals(intent.getAction())) {
-                finishAndRemoveTask();
+                if (!isFinishing()) {
+                    finishAndRemoveTask();
+                }
             } else if (Constant.UPDATA_MESSAGE_DATA_ACTION.equals(intent.getAction())) {
                 resetData(intent);
             }
