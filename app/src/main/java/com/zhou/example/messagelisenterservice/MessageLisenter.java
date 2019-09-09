@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -134,12 +133,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
+        enterForeground(-1);
+    }
+
+    private void enterForeground(int type) {
         exitForeground();
 
         Log.i(TAG, "enter fore ground");
         Intent intent = new Intent(this, ForegroundServer.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
+        intent.putExtra(ForegroundServer.GET_SERVER_TYPE_KEY, type);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
@@ -317,6 +320,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             startActivity(intent);
             //            其它消息不受限制
             closeNotifyTime = -1;
+            enterForeground(0);
             startPlaySound();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -537,25 +541,29 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     @Override
     public boolean handleMessage(Message msg) {
-        if (!(battery > 15)) {
-            waitBatteryNotify = true;
-            stopPlaySound();
-            return true;
+        switch (msg.what) {
+            case looperWhat:
+                if (!(battery > 15)) {
+                    waitBatteryNotify = true;
+                    stopPlaySound();
+                    return true;
+                }
+
+                int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
+                if (!config.isPlayMusic() && !config.isZhenDong()
+                        || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
+                    stopPlaySound();
+                    return true;
+                }
+
+                startLooper(config.getSleepTime(), startBattery);
+
+                if (config.isPlayMusic()) playNotifySound(rt);
+                if (config.isZhenDong()) zhengDong(vibrator);
+
+                return true;
         }
-
-        int startBattery = (int) (msg.obj == null ? -1 : msg.obj);
-        if (!config.isPlayMusic() && !config.isZhenDong()
-                || (startBattery != -1 && (startBattery - battery > 5))) { // 判断耗电量，超过 %5 则不再提示
-            stopPlaySound();
-            return true;
-        }
-
-        startLooper(config.getSleepTime(), startBattery);
-
-        if (config.isPlayMusic()) playNotifySound(rt);
-        if (config.isZhenDong()) zhengDong(vibrator);
-
-        return true;
+        return false;
     }
 
     private class MessageEnty {

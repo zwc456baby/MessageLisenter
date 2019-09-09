@@ -26,4 +26,5 @@
     <string name="passwd">密码</string>
     <string name="pause_notify_page_text">暂停通知对所有页面生效</string>
     <string name="wait_service_connect">等待服务连接</string>
+    <string name="click_close_notify">点击关闭通知</string>
 </resources>

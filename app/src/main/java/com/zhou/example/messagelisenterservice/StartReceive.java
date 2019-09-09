@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
  */
 
 public class StartReceive extends BroadcastReceiver {
+    public static final String TRY_CLOSE_ACTIVITY_ACTION = "try_close_activity_action";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -42,6 +43,11 @@ public class StartReceive extends BroadcastReceiver {
             intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startService(intent1);
             toggleNotificationListenerService(context);
+        }
+        if (TRY_CLOSE_ACTIVITY_ACTION.equals(intent.getAction())) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
+            context.sendBroadcast(sendIntent);
         }
 
     }

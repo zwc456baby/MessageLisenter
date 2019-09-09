@@ -19,6 +19,7 @@ import android.util.Log;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class ForegroundServer extends Service {
+    public static final String GET_SERVER_TYPE_KEY = "get_server_type_key";
 
     private final int FOREGROUND_ID = 1;
 
@@ -31,6 +32,8 @@ public class ForegroundServer extends Service {
     private final long MAX_SHOW_TIME = 10000;
 
     private long enterTime;
+
+    private int curShowType = -1;
 
     @Override
     public void onCreate() {
@@ -45,7 +48,14 @@ public class ForegroundServer extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handler.removeCallbacks(stopServerRunnable);
-        handler.postDelayed(stopServerRunnable, MAX_SHOW_TIME);
+        if (curShowType != 0) {
+            if (intent.getIntExtra(GET_SERVER_TYPE_KEY, -1) != 0) {
+                //如果不是常驻通知
+                handler.postDelayed(stopServerRunnable, MAX_SHOW_TIME);
+            } else {
+                curShowType = intent.getIntExtra(GET_SERVER_TYPE_KEY, 0);
+            }
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -81,7 +91,7 @@ public class ForegroundServer extends Service {
         Notification notification = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))//设置通知标题
                 .setChannelId(CHANNEL_ID)
-                .setContentText(getString(R.string.wait_service_connect))//设置通知内容
+                .setContentText(getString(R.string.click_close_notify))//设置通知内容
                 .setPriority(Notification.PRIORITY_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setOngoing(true)
@@ -90,10 +100,9 @@ public class ForegroundServer extends Service {
                 .setAutoCancel(true)
                 .build();//设置处于运行状态
 
-        Intent notificationIntent = new Intent(getApplicationContext(), ForegroundServer.class);
-//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        notification.contentIntent = PendingIntent.getService(getApplicationContext(),
+        Intent notificationIntent = new Intent(getApplicationContext(), StartReceive.class);
+        notificationIntent.setAction(StartReceive.TRY_CLOSE_ACTIVITY_ACTION);
+        notification.contentIntent = PendingIntent.getBroadcast(getApplicationContext(),
                 0, notificationIntent, 0);
 
         startForeground(FOREGROUND_ID, notification);
@@ -101,6 +110,7 @@ public class ForegroundServer extends Service {
 
     private void registerFinishBroad() {
         IntentFilter filter = new IntentFilter(Constant.FINISH_FOREGROUND_SERVICE);
+        filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
         registerReceiver(finishServiceBroadcast, filter);
     }
 
@@ -130,6 +140,10 @@ public class ForegroundServer extends Service {
                     handler.post(stopServerRunnable);
                 } else {
                     handler.postDelayed(stopServerRunnable, MIN_SHOW_TIME - temp);
+                }
+            } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
+                if (curShowType == 0) {
+                    handler.post(stopServerRunnable);
                 }
             }
         }

@@ -73,12 +73,6 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        sendPauseNotifyBroadcast();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterBroadCast();
