@@ -90,10 +90,10 @@ public class ForegroundServer extends Service {
                 .setAutoCancel(true)
                 .build();//设置处于运行状态
 
-        Intent notificationIntent = new Intent(getApplicationContext(), SettingActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), ForegroundServer.class);
 //        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        notification.contentIntent = PendingIntent.getActivity(getApplicationContext(),
+        notification.contentIntent = PendingIntent.getService(getApplicationContext(),
                 0, notificationIntent, 0);
 
         startForeground(FOREGROUND_ID, notification);

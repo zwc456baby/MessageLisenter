@@ -22,7 +22,7 @@ public class Constant {
     public final static String ACCOUNT_KEY = "account_key";
     public final static String PASSWD_KEY = "passwd_key";
 
-    public final static String GET_MESSAGE_LENGTH = "get_message_length";
+    public final static String GET_MESSAGE_KEY = "get_message_key";
 
     public final static String FINISH_FOREGROUND_ACTIVITY = "finish_foreground_activity";
     public final static String FINISH_LOCK_SHOW_ACTIVITY = "finish_lock_show_activity";

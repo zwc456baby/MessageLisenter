@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -48,18 +47,7 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     }
 
     private void resetData(Intent intent) {
-        String filterText = PreUtils.get(this, Constant.TITLE_FILTER_KEY, null);
-        if (TextUtils.isEmpty(filterText)) {
-            filterText = PreUtils.get(this, Constant.APP_PACKAGE_KEY, null);
-        }
-        if (TextUtils.isEmpty(filterText)) {
-            filterText = String.format(getString(R.string.filter_text)
-                    , PreUtils.get(this, Constant.MESSAGE_FILTER_KEY, "[NULL]"));
-        }
-
-        String showTvText = String.format(getString(R.string.show_message_count),
-                filterText
-                , intent.getIntExtra(Constant.GET_MESSAGE_LENGTH, -1));
+        String showTvText = intent.getStringExtra(Constant.GET_MESSAGE_KEY);
         showTv.setText(showTvText);
     }
 

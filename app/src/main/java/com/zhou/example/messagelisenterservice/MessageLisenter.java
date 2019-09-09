@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -25,6 +26,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -228,6 +232,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         if (isSettingMessage(sbn)) {
             addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
             startPlaySound();
+            startLockActivity();
         }
     }
 
@@ -242,7 +247,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             waitBatteryNotify = false;
             startLooper(0, battery);
         }
-        startLockActivity();
     }
 
     private void startLooper(long delay, int battery) {
@@ -260,7 +264,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void startLockActivity() {
         if (startLockActivity) {
             Intent intent = new Intent(this, LockShowActivity.class);
-            intent.putExtra(Constant.GET_MESSAGE_LENGTH, ntfMsgList.size());
+            intent.putExtra(Constant.GET_MESSAGE_KEY, getShowMessage());
             startActivity(intent);
         } else
             updataMessageData();
@@ -272,18 +276,57 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         sendBroadcast(sendIntent);
     }
 
+    private String getShowMessage() {
+        String filterText = PreUtils.get(this, Constant.TITLE_FILTER_KEY, null);
+        if (TextUtils.isEmpty(filterText)) {
+            filterText = PreUtils.get(this, Constant.APP_PACKAGE_KEY, null);
+        }
+        if (TextUtils.isEmpty(filterText)) {
+            filterText = String.format(getString(R.string.filter_text)
+                    , PreUtils.get(this, Constant.MESSAGE_FILTER_KEY, "[NULL]"));
+        }
+
+        return String.format(getString(R.string.show_message_count),
+                filterText
+                , ntfMsgList.size());
+    }
+
     private void updataMessageData() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Constant.UPDATA_MESSAGE_DATA_ACTION);
-        sendIntent.putExtra(Constant.GET_MESSAGE_LENGTH, ntfMsgList.size());
+        sendIntent.putExtra(Constant.GET_MESSAGE_KEY, getShowMessage());
         sendBroadcast(sendIntent);
+    }
+
+    private void sendOtherMessageData(String message) {
+        if (TextUtils.isEmpty(message)) {
+            return;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(message);
+            String account = jsonObject.getString("account");
+            String title = jsonObject.getString("title");
+            String text = jsonObject.getString("text");
+            String showTvText = String.format("%s\n%s\n%s", account, title, text);
+
+            Intent intent = new Intent(this, LockShowActivity.class);
+            intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
+            startActivity(intent);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            startPlaySound();
+        }
     }
 
     private void tryStopPlaysound(StatusBarNotification sbns) {
         String pkgName = sbns.getPackageName();
         int sbnId = sbns.getId();
-        removeNtfSbn(ntfMsgList, pkgName, sbnId);
         removeNtfSbn(tmpNullMsgList, pkgName, sbnId);
+        if (!hasMessage(ntfMsgList)) {
+            return;
+        }
+        removeNtfSbn(ntfMsgList, pkgName, sbnId);
         if (!handler.hasMessages(looperWhat)) return;
         if (!hasMessage(ntfMsgList)) {
             if (config.isPauseApplyToAllPage())
@@ -341,6 +384,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction(NetLogUtil.RECONNECT_ACTION);
         filter.addAction(NetLogUtil.CONNECT_ACTION);
+        filter.addAction(NetLogUtil.REICEIVE_MESSAGE_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -547,6 +591,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 if (hasMessage(ntfMsgList) && battery > 20
                         && !handler.hasMessages(looperWhat)) {
                     startPlaySound();
+                    startLockActivity();
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                 Log.i(TAG, "receive screen off action");
@@ -588,6 +633,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 }
                 exitForeground();
 //                exitForegroundActivity();
+            } else if (NetLogUtil.REICEIVE_MESSAGE_ACTION.equals(intent.getAction())) {
+                sendOtherMessageData(intent.getStringExtra(NetLogUtil.GET_MESSAGE_KEY));
             }
         }
     };
