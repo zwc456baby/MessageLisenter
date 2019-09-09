@@ -15,11 +15,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class ForegroundServer extends Service {
     public static final String GET_SERVER_TYPE_KEY = "get_server_type_key";
+    public static final String GET_NOTIFY_TITLE = "get_notify_title";
+    public static final String GET_NOTIFY_TEXT = "get_notify_text";
 
     private final int FOREGROUND_ID = 1;
 
@@ -56,6 +59,7 @@ public class ForegroundServer extends Service {
                 curShowType = intent.getIntExtra(GET_SERVER_TYPE_KEY, 0);
             }
         }
+        updateNotify(intent);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -76,6 +80,9 @@ public class ForegroundServer extends Service {
      */
     @TargetApi(Build.VERSION_CODES.O)
     private void setForegroundService() {
+        if (curShowType == 0) {
+            return;
+        }
         int importance = NotificationManager.IMPORTANCE_HIGH;
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channel_name, importance);
         channel.enableLights(true);
@@ -88,24 +95,48 @@ public class ForegroundServer extends Service {
             notificationManager.createNotificationChannel(channel);
         }
 
-        Notification notification = new Notification.Builder(this)
-                .setContentTitle(getString(R.string.app_name))//设置通知标题
-                .setChannelId(CHANNEL_ID)
-                .setContentText(getString(R.string.click_close_notify))//设置通知内容
+        Notification notification = getNotifycation(null);
+
+        startForeground(FOREGROUND_ID, notification);
+    }
+
+    private void updateNotify(Intent intent) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            Notification notification = getNotifycation(intent);
+
+            notificationManager.notify(FOREGROUND_ID, notification);
+        }
+    }
+
+    private Notification getNotifycation(Intent intent) {
+        String title = intent == null ? getString(R.string.app_name) :
+                TextUtils.isEmpty(intent.getStringExtra(GET_NOTIFY_TITLE)) ? getString(R.string.app_name)
+                        : intent.getStringExtra(GET_NOTIFY_TITLE);
+        String text = intent == null ? getString(R.string.click_close_notify) :
+                TextUtils.isEmpty(intent.getStringExtra(GET_NOTIFY_TEXT)) ? getString(R.string.click_close_notify)
+                        : intent.getStringExtra(GET_NOTIFY_TEXT);
+        Notification.Builder notificationBuilder = new Notification.Builder(this)
+                .setContentTitle(title)//设置通知标题
+                .setContentText(text)//设置通知内容
                 .setPriority(Notification.PRIORITY_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setOngoing(true)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setAutoCancel(true)
-                .build();//设置处于运行状态
+                .setAutoCancel(true);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationBuilder.setChannelId(CHANNEL_ID);
+        }
+
+        Notification notification = notificationBuilder.build();
 
         Intent notificationIntent = new Intent(getApplicationContext(), StartReceive.class);
         notificationIntent.setAction(StartReceive.TRY_CLOSE_ACTIVITY_ACTION);
         notification.contentIntent = PendingIntent.getBroadcast(getApplicationContext(),
                 0, notificationIntent, 0);
-
-        startForeground(FOREGROUND_ID, notification);
+        return notification;
     }
 
     private void registerFinishBroad() {

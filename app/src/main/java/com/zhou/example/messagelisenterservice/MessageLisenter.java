@@ -133,16 +133,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void enterForeground() {
-        enterForeground(-1);
+        enterForeground(-1, null, null);
     }
 
-    private void enterForeground(int type) {
-        exitForeground();
-
+    private void enterForeground(int type, String title, String text) {
         Log.i(TAG, "enter fore ground");
         Intent intent = new Intent(this, ForegroundServer.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(ForegroundServer.GET_SERVER_TYPE_KEY, type);
+        intent.putExtra(ForegroundServer.GET_NOTIFY_TITLE, title == null ? "" : title);
+        intent.putExtra(ForegroundServer.GET_NOTIFY_TEXT, text == null ? "" : text);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
@@ -322,7 +322,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
             //            其它消息不受限制
-            enterForeground(0);
+            enterForeground(0, title, text);
             closeNotifyTime = -1;
             startPlaySound();
             startActivity(intent);
