@@ -234,22 +234,25 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void tryStartPlaySound(StatusBarNotification sbn) {
         if (isSettingMessage(sbn)) {
             addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
-            startPlaySound();
-            startLockActivity();
+            if(startPlaySound()){
+                startLockActivity();
+            }
+
         }
     }
 
-    private void startPlaySound() {
+    private boolean startPlaySound() {
         if (!handler.hasMessages(looperWhat)) {
             // 用户勾选了暂停后指定时间不提示，而通过判断，它确实没有到达指定时间，则暂停通知，且等待电池状态改变后唤起
             if (ConfigEntry.getInstance().isClosePauseNotify()
                     && !((SystemClock.elapsedRealtime() - (closeNotifyTime)) > config.getPauseNotifyTime())) {
                 waitBatteryNotify = true;
-                return;
+                return false;
             }
             waitBatteryNotify = false;
             startLooper(0, battery);
         }
+        return true;
     }
 
     private void startLooper(long delay, int battery) {
@@ -317,11 +320,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
-            startActivity(intent);
             //            其它消息不受限制
             closeNotifyTime = -1;
             enterForeground(0);
-            startPlaySound();
+            if(startPlaySound()){
+                startActivity(intent);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -602,8 +606,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
                 if (hasMessage(ntfMsgList) && battery > 20
                         && !handler.hasMessages(looperWhat)) {
-                    startPlaySound();
-                    startLockActivity();
+                    if(startPlaySound()){
+                        startLockActivity();
+                    }
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                 Log.i(TAG, "receive screen off action");
