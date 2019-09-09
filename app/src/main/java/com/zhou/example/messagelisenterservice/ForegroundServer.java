@@ -80,7 +80,7 @@ public class ForegroundServer extends Service {
      */
     @TargetApi(Build.VERSION_CODES.O)
     private void setForegroundService() {
-        if (curShowType == 0) {
+        if (curShowType != -1) {
             return;
         }
         int importance = NotificationManager.IMPORTANCE_HIGH;
