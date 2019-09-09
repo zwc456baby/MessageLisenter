@@ -12,8 +12,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class LockShowActivity extends Activity implements View.OnClickListener {
+    public static final String GET_SHOW_ACTIVITY_TYPE = "get_show_activity_type";
 
     private TextView showTv;
+
+    private int curShowType = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,11 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     }
 
     private void resetData(Intent intent) {
+        int type = intent.getIntExtra(GET_SHOW_ACTIVITY_TYPE, -1);
+        if (curShowType == 0 && type != 0) {
+            return;
+        }
+        curShowType = type;
         String showTvText = intent.getStringExtra(Constant.GET_MESSAGE_KEY);
         showTv.setText(showTvText);
     }
@@ -54,6 +62,7 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
     private void sendPauseNotifyBroadcast() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
+        sendIntent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, curShowType);
         sendBroadcast(sendIntent);
     }
 
@@ -83,6 +92,10 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Constant.FINISH_LOCK_SHOW_ACTIVITY.equals(intent.getAction())) {
+                int type = intent.getIntExtra(GET_SHOW_ACTIVITY_TYPE, -1);
+                if (curShowType == 0 && type != 0) {
+                    return;
+                }
                 if (!isFinishing()) {
                     finishAndRemoveTask();
                 }

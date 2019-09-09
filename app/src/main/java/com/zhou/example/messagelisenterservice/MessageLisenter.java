@@ -234,7 +234,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void tryStartPlaySound(StatusBarNotification sbn) {
         if (isSettingMessage(sbn)) {
             addNtfMessage(ntfMsgList, sbn.getPackageName(), sbn.getId());
-            if(startPlaySound()){
+            if (startPlaySound()) {
                 startLockActivity();
             }
 
@@ -276,9 +276,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             updataMessageData();
     }
 
-    private void finishLockActivity() {
+    private void finishLockActivity(int type) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Constant.FINISH_LOCK_SHOW_ACTIVITY);
+        sendIntent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, type);
         sendBroadcast(sendIntent);
     }
 
@@ -321,11 +322,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
             //            其它消息不受限制
-            closeNotifyTime = -1;
             enterForeground(0);
-            if(startPlaySound()){
-                startActivity(intent);
-            }
+            closeNotifyTime = -1;
+            startPlaySound();
+            startActivity(intent);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -348,11 +348,16 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void stopPlaySound() {
-        finishLockActivity();
+        stopPlaySound(-1);
+    }
+
+    private void stopPlaySound(int type) {
+        finishLockActivity(type);
 
         handler.removeMessages(looperWhat);
         stopNotify(rt, vibrator);
     }
+
 
     /*
      * 播放一次系统提示音
@@ -606,7 +611,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
                 if (hasMessage(ntfMsgList) && battery > 20
                         && !handler.hasMessages(looperWhat)) {
-                    if(startPlaySound()){
+                    if (startPlaySound()) {
                         startLockActivity();
                     }
                 }
@@ -619,7 +624,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             } else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                 Log.i(TAG, "receive user presend action");
                 startLockActivity = false;
-                finishLockActivity();
+                finishLockActivity(-1);
                 if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
                     uploadMsg();
                 }
@@ -627,7 +632,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 Log.i(TAG, "receive close activity action");
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
-                stopPlaySound();
+                stopPlaySound(intent.getIntExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, -1));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive net connect change action");
                 autoStartNetLog();

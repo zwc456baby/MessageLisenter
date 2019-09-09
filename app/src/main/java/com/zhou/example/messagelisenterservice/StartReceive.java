@@ -47,6 +47,7 @@ public class StartReceive extends BroadcastReceiver {
         if (TRY_CLOSE_ACTIVITY_ACTION.equals(intent.getAction())) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
+            sendIntent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, 0);
             context.sendBroadcast(sendIntent);
         }
 
