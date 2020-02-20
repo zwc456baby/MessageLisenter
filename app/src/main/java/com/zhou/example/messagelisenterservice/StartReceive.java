@@ -34,7 +34,7 @@ public class StartReceive extends BroadcastReceiver {
                 return;
             }
             ConfigEntry configEntry = ConfigEntry.getInstance();
-            configEntry.setConfig(intent);
+            configEntry.setConfig(context, intent);
             configEntry.writeConfig(context);
 
             Intent intent1 = new Intent(context, MessageLisenter.class);

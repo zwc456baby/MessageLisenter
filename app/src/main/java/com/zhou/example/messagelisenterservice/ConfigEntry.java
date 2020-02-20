@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.zhou.netlogutil.NetLogUtil;
+import com.zhou.netlogutil.PushCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,7 +52,7 @@ public class ConfigEntry {
             writeConfigToXml(context);
         }
 
-        InitNetLog();
+        InitNetLog(context);
     }
 
     public void writeConfig(Context context) {
@@ -59,13 +60,38 @@ public class ConfigEntry {
         writeConfigToXml(context);
     }
 
-    private void InitNetLog() {
-        NetLogUtil.getConfig().configAccount(account)
-                .configFileName("notifycation.log")
-                .configCrypto(true)
-                .configReconnectTime(5 * 1000)
-                .configAESKey(passwd)
-                .configUrl(netLogUrl);
+    private void InitNetLog(final Context context) {
+        if (TextUtils.isEmpty(netLogUrl)) {
+            NetLogUtil.disconnect();
+            return;
+        }
+        NetLogUtil.NetLogConfig config = NetLogUtil.buildConfig();
+        config.configAccount(account);
+        config.configFileName("notifycation.log");
+        config.configUrl(netLogUrl);
+        config.configCrypto(true);
+        config.configSocketCallback(new PushCallback() {
+            @Override
+            public void onConnect() {
+            }
+
+            @Override
+            public void onDisconnect() {
+            }
+
+            @Override
+            public void onReconnect() {
+            }
+
+            @Override
+            public void onMessage(String s) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Constant.RECEIVE_SOCKET_MESSAGE_ACTION);
+                sendIntent.putExtra(Constant.GET_MESSAGE_KEY, s);
+                context.sendBroadcast(sendIntent);
+            }
+        });
+        NetLogUtil.connect(context, config);
     }
 
     private String getConfigFilePath(Context context) {
@@ -173,7 +199,7 @@ public class ConfigEntry {
         PreUtils.put(context, Constant.PASSWD_KEY, passwd);
     }
 
-    public void setConfig(Intent intent) {
+    public void setConfig(Context context, Intent intent) {
         String appPackage = intent.getStringExtra(Constant.APP_PACKAGE_KEY);
         String titleFilter = intent.getStringExtra(Constant.TITLE_FILTER_KEY);
         String messageFilter = intent.getStringExtra(Constant.MESSAGE_FILTER_KEY);
@@ -194,13 +220,13 @@ public class ConfigEntry {
         String account = intent.getStringExtra(Constant.ACCOUNT_KEY);
         String passwd = intent.getStringExtra(Constant.PASSWD_KEY);
 
-        setConfig(appPackage, titleFilter, messageFilter,
+        setConfig(context, appPackage, titleFilter, messageFilter,
                 playMusic, zhengDong, cancelable, sleepTime
                 , pauseNotifyEnable, pauseNotifyTime, pauseApplyToAllPage
                 , netLogUrl, account, passwd);
     }
 
-    private void setConfig(String packageFilter, String titleFilter, String msgFilter
+    private void setConfig(Context context, String packageFilter, String titleFilter, String msgFilter
             , boolean playMusic, boolean zhenDong, boolean cancelable, long sleepTime
             , boolean closePauseNotify, long pauseNotifyTime, boolean pauseApplyToAllPage
             , String netLogUrl, String account, String passwd) {
@@ -218,7 +244,7 @@ public class ConfigEntry {
         this.account = account;
         this.passwd = passwd;
 
-        InitNetLog();
+        InitNetLog(context);
     }
 
     /************              get and se method *****************/

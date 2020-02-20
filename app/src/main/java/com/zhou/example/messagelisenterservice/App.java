@@ -13,10 +13,10 @@ public class App extends Application {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable throwable) {
-                Utils.putStr("exception:" + Log.getStackTraceString(throwable));
+                Utils.putStr(App.this, "exception:" + Log.getStackTraceString(throwable));
                 Process.killProcess(Process.myPid());
             }
         });
-        NetLogUtil.Init(this);
+
     }
 }

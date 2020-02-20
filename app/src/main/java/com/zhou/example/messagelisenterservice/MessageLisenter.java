@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -48,8 +46,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private final ArrayList<MessageEnty> ntfMsgList = new ArrayList<>();
     // 暂存一下空的消息的包名和id
     private final ArrayList<MessageEnty> tmpNullMsgList = new ArrayList<>();
-    private final ArrayList<String> uploadMsg = new ArrayList<>();
-    private long uploadTime = -1;
+    //    private final ArrayList<String> uploadMsg = new ArrayList<>();
+//    private long uploadTime = -1;
     //    配置相关
     private ConfigEntry config;
 
@@ -74,7 +72,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         InitPlay();
         registerHomeBroad();
         reloadConfig();
-        autoStartNetLog();
     }
 
     @Override
@@ -118,7 +115,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     public void onListenerDisconnected() {
         Log.i(TAG, "message listen disconnect");
         super.onListenerDisconnected();
-        uploadMsg();
         clearNfSbnAndStopSound();
     }
 
@@ -126,7 +122,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     public void onDestroy() {
         Log.i(TAG, "message listen server destroy");
         super.onDestroy();
-        uploadMsg();
         clearNfSbnAndStopSound();
         unregisterHomeBroad();
         cleanPlay();
@@ -398,10 +393,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_USER_PRESENT);
         filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(NetLogUtil.RECONNECT_ACTION);
-        filter.addAction(NetLogUtil.CONNECT_ACTION);
-        filter.addAction(NetLogUtil.REICEIVE_MESSAGE_ACTION);
+        filter.addAction(Constant.RECEIVE_SOCKET_MESSAGE_ACTION);
+//        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
 
@@ -436,14 +429,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +
                 "[" + subText + "]" + "\n";
 
-        Utils.putStr(writText);
+        Utils.putStr(MessageLisenter.this, writText);
 
         //如果不位于前台，则添加到列表中
         //如果处于前台，则直接清空队列并上传
         if (!TextUtils.isEmpty(config.getNetLogUrl())) {
-            addMsgAndUpload(writText);
-        } else if (uploadMsg.size() > 0) {
-            uploadMsg.clear();
+            NetLogUtil.log(writText);
         }
     }
 
@@ -451,34 +442,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         return TextUtils.isEmpty(ntTitle)
                 && TextUtils.isEmpty(ntText)
                 && TextUtils.isEmpty(subText);
-    }
-
-    private void addMsgAndUpload(String msg) {
-        uploadMsg.add(msg);
-        if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-            uploadMsg();
-        }
-        //为防止内存泄漏，最大只允许 100 条数据
-        if (uploadMsg.size() >= 100) {
-            uploadMsg.remove(0);
-        }
-
-    }
-
-    private void uploadMsg() {
-        if (uploadMsg.size() <= 0) return;
-        if (!getNetIsConnect()) {
-            return;
-        }
-        NetLogUtil.resume();
-        if (!NetLogUtil.isConnect()) {
-            return;
-        }
-        for (String msg : uploadMsg) {
-            NetLogUtil.log(msg);
-        }
-        uploadTime = SystemClock.elapsedRealtime();
-        uploadMsg.clear();
     }
 
     private void addNtfMessage(ArrayList<MessageEnty> list, String pkgName, int Id) {
@@ -521,31 +484,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         rt = null;
         vibrator = null;
         pm = null;
-    }
-
-    /**
-     * 自动判断并启动网络日志
-     */
-    private void autoStartNetLog() {
-        if (getNetIsConnect()) {
-            Log.i(TAG, "resume ");
-            NetLogUtil.resume();
-            Log.i(TAG, "resume end");
-        } else {
-            Log.i(TAG, "pause ");
-            NetLogUtil.pause();
-        }
-    }
-
-    private boolean getNetIsConnect() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) this
-                .getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo info = null;
-        if (connectivityManager != null) {
-            info = connectivityManager.getActiveNetworkInfo();
-        }
-        return info != null
-                && info.getState() == NetworkInfo.State.CONNECTED;
     }
 
     @Override
@@ -625,38 +563,14 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 Log.i(TAG, "receive user presend action");
                 startLockActivity = false;
                 finishLockActivity(-1);
-                if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-                    uploadMsg();
-                }
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
                 Log.i(TAG, "receive close activity action");
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound(intent.getIntExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, -1));
-            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                Log.i(TAG, "receive net connect change action");
-                autoStartNetLog();
-            } else if (NetLogUtil.RECONNECT_ACTION.equals(intent.getAction())) {
-                Log.i(TAG, "receive socket reconnect action");
-//                enterForegroundActivity();
-                Utils.resetReconnectTime();
-
-                boolean faild = NetLogUtil.EXTERNAL_FAILD.equals(
-                        intent.getStringExtra(NetLogUtil.EXTERNAL_KEY)
-                );
-                if (faild && getNetIsConnect()) {
-                    enterForeground();
-                }
-            } else if (NetLogUtil.CONNECT_ACTION.equals(intent.getAction())) {
-                Log.i(TAG, "receive socket connect action");
-                NetLogUtil.getConfig().configReconnectTime(5 * 1000);
-                if (Utils.needUpload(uploadMsg.size(), uploadTime)) {
-                    uploadMsg();
-                }
-                exitForeground();
-//                exitForegroundActivity();
-            } else if (NetLogUtil.REICEIVE_MESSAGE_ACTION.equals(intent.getAction())) {
-                sendOtherMessageData(intent.getStringExtra(NetLogUtil.GET_MESSAGE_KEY));
+            } else if (Constant.RECEIVE_SOCKET_MESSAGE_ACTION.equals(intent.getAction())) {
+                Log.i(TAG, "receive other message");
+                sendOtherMessageData(intent.getStringExtra(Constant.GET_MESSAGE_KEY));
             }
         }
     };
