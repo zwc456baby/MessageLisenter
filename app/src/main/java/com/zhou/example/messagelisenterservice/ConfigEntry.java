@@ -70,6 +70,7 @@ public class ConfigEntry {
         config.configFileName("notifycation.log");
         config.configUrl(netLogUrl);
         config.configCrypto(true);
+        config.configAESKey(passwd);
         config.configSocketCallback(new PushCallback() {
             @Override
             public void onConnect() {
