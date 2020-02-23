@@ -165,6 +165,9 @@ public class ForegroundServer extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Constant.FINISH_FOREGROUND_SERVICE.equals(intent.getAction())) {
+                if (curShowType == 0) {  //如果是常驻的通知，不接受停止前台指令
+                    return;
+                }
                 long temp = SystemClock.elapsedRealtime() - enterTime;
                 handler.removeCallbacks(stopServerRunnable);
                 if (temp > MIN_SHOW_TIME) {

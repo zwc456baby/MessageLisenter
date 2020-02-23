@@ -30,7 +30,7 @@ public class Constant {
     public final static String CLOSE_ACTIVITY_STOP_NOTIFY_ACTION = "close_activity_stop_notify_action";
     public final static String FINISH_FOREGROUND_SERVICE = "finish_foreground_service";
 
-    public final static String RECEIVE_SOCKET_MESSAGE_ACTION = "receive_socket_message_action";
+//    public final static String RECEIVE_SOCKET_MESSAGE_ACTION = "receive_socket_message_action";
 
     public static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
 

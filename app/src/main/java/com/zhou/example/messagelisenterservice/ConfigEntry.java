@@ -51,48 +51,11 @@ public class ConfigEntry {
             loadConfigFromFile(context);
             writeConfigToXml(context);
         }
-
-        InitNetLog(context);
     }
 
     public void writeConfig(Context context) {
         writeConfigToFile(context);
         writeConfigToXml(context);
-    }
-
-    private void InitNetLog(final Context context) {
-        if (TextUtils.isEmpty(netLogUrl)) {
-            NetLogUtil.disconnect();
-            return;
-        }
-        NetLogUtil.NetLogConfig config = NetLogUtil.buildConfig();
-        config.configAccount(account);
-        config.configFileName("notifycation.log");
-        config.configUrl(netLogUrl);
-        config.configCrypto(true);
-        config.configAESKey(passwd);
-        config.configSocketCallback(new PushCallback() {
-            @Override
-            public void onConnect() {
-            }
-
-            @Override
-            public void onDisconnect() {
-            }
-
-            @Override
-            public void onReconnect() {
-            }
-
-            @Override
-            public void onMessage(String s) {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Constant.RECEIVE_SOCKET_MESSAGE_ACTION);
-                sendIntent.putExtra(Constant.GET_MESSAGE_KEY, s);
-                context.sendBroadcast(sendIntent);
-            }
-        });
-        NetLogUtil.connect(context, config);
     }
 
     private String getConfigFilePath(Context context) {
@@ -244,8 +207,6 @@ public class ConfigEntry {
         this.netLogUrl = netLogUrl;
         this.account = account;
         this.passwd = passwd;
-
-        InitNetLog(context);
     }
 
     /************              get and se method *****************/

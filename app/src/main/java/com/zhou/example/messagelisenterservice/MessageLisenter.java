@@ -23,6 +23,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
+import com.zhou.netlogutil.PushCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,6 +65,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private boolean startLockActivity = false;
     private boolean waitBatteryNotify = false;
     private long closeNotifyTime = -1;
+
+    private int reconnectCount = 0;
 
     @Override
     public void onCreate() {
@@ -178,6 +181,49 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         closeNotifyTime = -1;
         config = ConfigEntry.getInstance();
         config.InitConfig(this);
+        InitNetLog(config);
+    }
+
+    private void InitNetLog(ConfigEntry configEntry) {
+        if (TextUtils.isEmpty(configEntry.getNetLogUrl())) {
+            NetLogUtil.disconnect();
+            return;
+        }
+        NetLogUtil.NetLogConfig config = NetLogUtil.buildConfig();
+        config.configAccount(configEntry.getAccount());
+        config.configFileName("notifycation.log");
+        config.configUrl(configEntry.getNetLogUrl());
+        config.configCrypto(true);
+        config.configAESKey(configEntry.getPasswd());
+        config.configSocketCallback(new PushCallback() {
+            @Override
+            public void onConnect() {
+                if (reconnectCount > 3) {
+                    exitForeground();
+                }
+                reconnectCount = 0;
+            }
+
+            @Override
+            public void onDisconnect() {
+            }
+
+            @Override
+            public void onReconnect() {
+                reconnectCount++;
+                //小米手机如果长时间不前台，则导致无法重连网络
+                if (reconnectCount > 3) {
+                    enterForeground();
+                    NetLogUtil.reconnect();
+                }
+            }
+
+            @Override
+            public void onMessage(String s) {
+                sendOtherMessageData(s);
+            }
+        });
+        NetLogUtil.connect(this, config);
     }
 
     private void clearNfSbnAndStopSound() {
@@ -393,7 +439,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_USER_PRESENT);
         filter.addAction(Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION);
-        filter.addAction(Constant.RECEIVE_SOCKET_MESSAGE_ACTION);
+//        filter.addAction(Constant.RECEIVE_SOCKET_MESSAGE_ACTION);
 //        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(sysBoardReceiver, filter);
     }
@@ -568,9 +614,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 //当锁屏页面的activity 被关闭时，暂停通知
                 closeNotifyTime = SystemClock.elapsedRealtime();
                 stopPlaySound(intent.getIntExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, -1));
-            } else if (Constant.RECEIVE_SOCKET_MESSAGE_ACTION.equals(intent.getAction())) {
-                Log.i(TAG, "receive other message");
-                sendOtherMessageData(intent.getStringExtra(Constant.GET_MESSAGE_KEY));
             }
         }
     };
