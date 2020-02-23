@@ -65,6 +65,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private boolean startLockActivity = false;
     private boolean waitBatteryNotify = false;
     private long closeNotifyTime = -1;
+    private long enterForegroundTime = -1;
 
     private int reconnectCount = 0;
 
@@ -136,6 +137,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void enterForeground(int type, String title, String text) {
         Log.i(TAG, "enter fore ground");
+        enterForegroundTime = SystemClock.elapsedRealtime();
         Intent intent = new Intent(this, ForegroundServer.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(ForegroundServer.GET_SERVER_TYPE_KEY, type);
@@ -151,6 +153,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
     private void enterForegroundActivity() {
         exitForegroundActivity();
+        enterForegroundTime = SystemClock.elapsedRealtime();
         Intent startActivityIntent = new Intent(this, ForegroundActivity.class);
         startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startActivityIntent);
@@ -212,7 +215,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             public void onReconnect() {
                 reconnectCount++;
                 //小米手机如果长时间不前台，则导致无法重连网络
-                if (reconnectCount > 3) {
+                if (reconnectCount > 3 && (SystemClock.elapsedRealtime() - enterForegroundTime
+                        > 6 * 60 * 60 * 1000)) {
                     reconnectCount = 0;
                     enterForeground();
                     NetLogUtil.reconnect();
