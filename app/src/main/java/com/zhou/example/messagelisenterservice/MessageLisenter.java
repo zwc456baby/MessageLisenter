@@ -25,7 +25,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
-import com.zhou.netlogutil.PushCallback;
+import com.zhou.netlogutil.SocketCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -200,7 +200,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         config.configUrl(configEntry.getNetLogUrl());
         config.configCrypto(true);
         config.configAESKey(configEntry.getPasswd());
-        config.configSocketCallback(new PushCallback() {
+        config.configSocketCallback(new SocketCallback() {
             @Override
             public void onConnect() {
                 if (reconnectCount > 3) {

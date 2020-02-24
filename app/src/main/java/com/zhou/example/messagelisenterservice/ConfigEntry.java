@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.zhou.netlogutil.NetLogUtil;
-import com.zhou.netlogutil.PushCallback;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
