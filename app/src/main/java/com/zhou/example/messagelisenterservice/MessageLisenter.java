@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -213,10 +215,13 @@ public class MessageLisenter extends NotificationListenerService implements Hand
 
             @Override
             public void onReconnect() {
-                reconnectCount++;
+                if (reconnectCount < Integer.MAX_VALUE) {
+                    reconnectCount++;
+                }
                 //小米手机如果长时间不前台，则导致无法重连网络
-                if (reconnectCount > 3 && (SystemClock.elapsedRealtime() - enterForegroundTime
-                        > 3 * 60 * 60 * 1000)) {
+                if (reconnectCount > 3
+                        && (SystemClock.elapsedRealtime() - enterForegroundTime > 3 * 60 * 60 * 1000)
+                        && getNetIsConnect() != 0) {
                     reconnectCount = 0;
                     enterForeground();
                     NetLogUtil.reconnect();
@@ -229,6 +234,18 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             }
         });
         NetLogUtil.connect(this, config);
+    }
+
+    private int getNetIsConnect() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo info = null;
+        if (connectivityManager != null) {
+            info = connectivityManager.getActiveNetworkInfo();
+        }
+        if (info == null) {
+            return -1;
+        }
+        return info.getState() == NetworkInfo.State.CONNECTED ? 1 : 0;
     }
 
     private void clearNfSbnAndStopSound() {
