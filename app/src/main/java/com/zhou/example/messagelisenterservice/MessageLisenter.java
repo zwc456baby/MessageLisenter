@@ -216,7 +216,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 reconnectCount++;
                 //小米手机如果长时间不前台，则导致无法重连网络
                 if (reconnectCount > 3 && (SystemClock.elapsedRealtime() - enterForegroundTime
-                        > 6 * 60 * 60 * 1000)) {
+                        > 3 * 60 * 60 * 1000)) {
                     reconnectCount = 0;
                     enterForeground();
                     NetLogUtil.reconnect();
