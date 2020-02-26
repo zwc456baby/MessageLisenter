@@ -201,9 +201,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         config.configCrypto(true);
         config.configAESKey(configEntry.getPasswd());
         config.configSocketCallback(new SocketCallback() {
+            boolean isForeground = false;
+
             @Override
             public void onConnect() {
-                if (reconnectCount > 3) {
+                if (isForeground) {
+                    isForeground = false;
                     exitForeground();
                 }
                 reconnectCount = 0;
@@ -222,6 +225,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 if (reconnectCount > 3
                         && (SystemClock.elapsedRealtime() - enterForegroundTime > 3 * 60 * 60 * 1000)
                         && getNetIsConnect() != 0) {
+                    isForeground = true;
                     reconnectCount = 0;
                     enterForeground();
                     NetLogUtil.reconnect();
