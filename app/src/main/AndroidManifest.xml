@@ -58,7 +58,7 @@
             <intent-filter>
                 <action android:name="android.provider.Telephony.SECRET_CODE" />
                 <data
-                    android:host="1234"
+                    android:host="9989"
                     android:scheme="android_secret_code" />
             </intent-filter>
         </receiver>
