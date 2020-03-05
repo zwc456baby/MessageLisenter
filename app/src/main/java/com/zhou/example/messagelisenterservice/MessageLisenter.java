@@ -200,6 +200,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         config.configUrl(configEntry.getNetLogUrl());
         config.configCrypto(true);
         config.configAESKey(configEntry.getPasswd());
+        config.configCustomizePing(true);
         config.configSocketCallback(new SocketCallback() {
             boolean isForeground = false;
 
