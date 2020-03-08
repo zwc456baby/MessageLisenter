@@ -131,6 +131,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         clearNfSbnAndStopSound();
         unregisterHomeBroad();
         cleanPlay();
+        NetLogUtil.flush(1000);
     }
 
     private void enterForeground() {
