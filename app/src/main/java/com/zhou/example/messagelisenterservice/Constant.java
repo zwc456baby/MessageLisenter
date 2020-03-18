@@ -20,7 +20,7 @@ public class Constant {
 
     public final static String NET_LOG_URL_KEY = "net_log_url_key";
     public final static String ACCOUNT_KEY = "account_key";
-    public final static String PASSWD_KEY = "passwd_key";
+    public final static String FILENAME_KEY = "filename_key";
 
     public final static String GET_MESSAGE_KEY = "get_message_key";
 

@@ -148,12 +148,12 @@
 
         <TextView
             style="@style/setting_edit_text"
-            android:text="@string/passwd_tip" />
+            android:text="@string/filename_tip" />
 
         <EditText
-            android:id="@+id/passwdEdit"
+            android:id="@+id/filenameEdit"
             style="@style/setting_edit"
-            android:hint="@string/passwd" />
+            android:hint="@string/filename" />
 
         <RelativeLayout
             android:layout_width="match_parent"

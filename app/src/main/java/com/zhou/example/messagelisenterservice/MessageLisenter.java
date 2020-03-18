@@ -25,7 +25,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.zhou.netlogutil.NetLogUtil;
-import com.zhou.netlogutil.SocketCallback;
+import com.zhou.netlogutil.handler.NetLogConfig;
+import com.zhou.netlogutil.socket.SocketCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -195,12 +196,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             NetLogUtil.disconnect();
             return;
         }
-        NetLogUtil.NetLogConfig config = NetLogUtil.buildConfig();
+        NetLogConfig config = NetLogUtil.buildConfig();
         config.configAccount(configEntry.getAccount());
-        config.configFileName("notifycation.log");
+        config.configFileName(TextUtils.isEmpty(configEntry.getFilename()) ?
+                "notifycation.log" : configEntry.getFilename());
         config.configUrl(configEntry.getNetLogUrl());
         config.configCrypto(true);
-        config.configAESKey(configEntry.getPasswd());
         config.configCustomizePing(true);
         config.configSocketCallback(new SocketCallback() {
             boolean isForeground = false;
