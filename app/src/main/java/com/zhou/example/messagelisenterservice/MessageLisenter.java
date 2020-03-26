@@ -385,12 +385,18 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             if (TextUtils.isEmpty(account) || !account.equals(config.getAccount())) {
                 return;
             }
+            int type = jsonObject.optInt("type", 0);
             String title = jsonObject.getString("title");
             String text = jsonObject.getString("text");
+            if (type > 0) {
+                Utils.sendNotifyMessage(this, title, text, type);
+                return;
+            }
             String showTvText = String.format("%s\n%s\n%s", account, title, text);
 
             Intent intent = new Intent(this, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
+            intent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, 0);
             //            其它消息不受限制
             enterForeground(0, title, text);
             closeNotifyTime = -1;
@@ -424,8 +430,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void stopPlaySound(int type) {
         finishLockActivity(type);
 
-        handler.removeMessages(looperWhat);
-        stopNotify(rt, vibrator);
+        if (type == -1 || type == 0) {
+            handler.removeMessages(looperWhat);
+            stopNotify(rt, vibrator);
+        }
     }
 
 

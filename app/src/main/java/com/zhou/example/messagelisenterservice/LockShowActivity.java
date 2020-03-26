@@ -49,6 +49,12 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         resetData(getIntent());
     }
 
+    /**
+     * 显示通知类型：
+     * -1 ：检测到对应的配置通知
+     * 0 ： 远程的重要通知
+     * 1 ： 通知栏通知
+     */
     private void resetData(Intent intent) {
         int type = intent.getIntExtra(GET_SHOW_ACTIVITY_TYPE, -1);
         if (curShowType == 0 && type != 0) {
@@ -93,7 +99,7 @@ public class LockShowActivity extends Activity implements View.OnClickListener {
         public void onReceive(Context context, Intent intent) {
             if (Constant.FINISH_LOCK_SHOW_ACTIVITY.equals(intent.getAction())) {
                 int type = intent.getIntExtra(GET_SHOW_ACTIVITY_TYPE, -1);
-                if (curShowType == 0 && type != 0) {
+                if (type != curShowType) {
                     return;
                 }
                 if (!isFinishing()) {

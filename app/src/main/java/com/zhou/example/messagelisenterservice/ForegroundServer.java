@@ -2,7 +2,6 @@ package com.zhou.example.messagelisenterservice;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -83,18 +82,9 @@ public class ForegroundServer extends Service {
         if (curShowType != -1) {
             return;
         }
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channel_name, importance);
-        channel.enableLights(true);
-        channel.setShowBadge(true);
-        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (notificationManager != null) {
-            Log.i("ForegoundServer", "create notify channel");
-            notificationManager.createNotificationChannel(channel);
-        }
-
+        Utils.createNotificationChannel(this, CHANNEL_ID, channel_name
+                , NotificationManager.IMPORTANCE_HIGH);
         Notification notification = getNotifycation(null);
 
         startForeground(FOREGROUND_ID, notification);
@@ -176,7 +166,8 @@ public class ForegroundServer extends Service {
                     handler.postDelayed(stopServerRunnable, MIN_SHOW_TIME - temp);
                 }
             } else if (Constant.CLOSE_ACTIVITY_STOP_NOTIFY_ACTION.equals(intent.getAction())) {
-                if (curShowType == 0) {
+                int type = intent.getIntExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, -1);
+                if (curShowType == 0 && curShowType == type) {
                     handler.post(stopServerRunnable);
                 }
             }
