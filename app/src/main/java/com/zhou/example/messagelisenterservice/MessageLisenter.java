@@ -201,6 +201,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         config.configFileName(TextUtils.isEmpty(configEntry.getFilename()) ?
                 "notifycation.log" : configEntry.getFilename());
         config.configUrl(configEntry.getNetLogUrl());
+        config.configMinReconnectTime(5000);
+        config.configConnectTimeout(5000);
+        config.configReconnectTime(10000);
         config.configCrypto(true);
         config.configCustomizePing(true);
         config.configSocketCallback(new SocketCallback() {
