@@ -113,6 +113,7 @@ public class ForegroundServer extends Service {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setOngoing(true)
                 .setWhen(System.currentTimeMillis())
+                .setShowWhen(true)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setAutoCancel(true);
 

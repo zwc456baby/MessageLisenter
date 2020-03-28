@@ -234,7 +234,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     isForeground = true;
                     reconnectCount = 0;
                     enterForeground();
-                    NetLogUtil.reconnect();
                 }
             }
 

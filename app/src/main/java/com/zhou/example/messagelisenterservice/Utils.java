@@ -85,6 +85,7 @@ class Utils {
             notificationBuild.setContentTitle(title)
                     .setContentText(text)
                     .setWhen(System.currentTimeMillis())
+                    .setShowWhen(true)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setPriority(Notification.PRIORITY_HIGH)
                     .setAutoCancel(true);
