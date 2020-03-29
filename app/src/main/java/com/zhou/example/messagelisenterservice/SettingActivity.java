@@ -1,11 +1,14 @@
 package com.zhou.example.messagelisenterservice;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +31,7 @@ public class SettingActivity extends Activity {
         findView();
         setViewData();
         setViewLisenter();
+        checkBettryWhiteList();
     }
 
     private void findView() {
@@ -84,6 +88,21 @@ public class SettingActivity extends Activity {
                 gotoNotificationAccessSetting(SettingActivity.this);
             }
         });
+    }
+
+    private void checkBettryWhiteList() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            if (powerManager == null) return;
+            if (!powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
+                //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+                @SuppressLint("BatteryLife")
+                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+            }
+        }
+
     }
 
     private void startRemoteService() {
