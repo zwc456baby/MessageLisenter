@@ -88,7 +88,7 @@ class Utils {
                     .setShowWhen(true)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setPriority(Notification.PRIORITY_HIGH)
-                    .setAutoCancel(true);
+                    .setAutoCancel(false);
             int id = (channelId + String.valueOf(System.currentTimeMillis())).hashCode();
             String showTvText = String.format("%s\n%s", title, text);
             Intent intent = new Intent(context, LockShowActivity.class);
