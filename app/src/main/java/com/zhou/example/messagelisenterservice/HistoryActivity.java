@@ -1,11 +1,11 @@
 package com.zhou.example.messagelisenterservice;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +19,11 @@ import java.util.List;
 
 public class HistoryActivity extends Activity {
 
-    private Handler handler = new Handler(Looper.getMainLooper());
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+        registerReceiver(sysBoardReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         showList();
     }
 
@@ -100,22 +99,18 @@ public class HistoryActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        handler.removeCallbacks(finishRunnable);
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(sysBoardReceiver);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        handler.postDelayed(finishRunnable, 60 * 1000);
-    }
-
-    private Runnable finishRunnable = new Runnable() {
+    private BroadcastReceiver sysBoardReceiver = new BroadcastReceiver() {
         @Override
-        public void run() {
-            if (!isFinishing()) {
-                finishAndRemoveTask();
+        public void onReceive(Context context, Intent intent) {
+            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
+                if (!HistoryActivity.this.isFinishing()) {
+                    HistoryActivity.this.finishAndRemoveTask();
+                }
             }
         }
     };
