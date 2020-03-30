@@ -181,6 +181,7 @@ public class SettingActivity extends Activity {
         //给Intent添加 对应的flag
         shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_NEW_TASK);
         Intent resultIntent = new Intent();
+        resultIntent.setAction(Intent.ACTION_VIEW); //action必须设置，不然报错
         resultIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(this,
                         R.drawable.ic_launcher));

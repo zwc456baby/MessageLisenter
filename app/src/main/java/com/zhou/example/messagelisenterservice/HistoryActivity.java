@@ -33,6 +33,12 @@ public class HistoryActivity extends Activity {
     private void showList() {
         ListView historyListView = findViewById(R.id.historyListView);
         ArrayList<MessageBean> list = Utils.stringToMap(PreUtils.get(this, Constant.KEY_HISTORY_LIST, ""));
+        if (list.size() == 0) {
+            TextView nullTip = findViewById(R.id.historyNullTipTv);
+            historyListView.setVisibility(View.GONE);
+            nullTip.setVisibility(View.VISIBLE);
+            return;
+        }
         historyListView.setAdapter(new ListAdapter(this, R.layout.listview_history_item, list));
     }
 
@@ -93,14 +99,14 @@ public class HistoryActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         handler.removeCallbacks(finishRunnable);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         handler.postDelayed(finishRunnable, 60 * 1000);
     }
 

@@ -20,7 +20,11 @@
         <activity
             android:name=".HistoryActivity"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance" />
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".LockShowActivity"
             android:excludeFromRecents="true"

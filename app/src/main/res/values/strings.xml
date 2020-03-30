@@ -29,4 +29,5 @@
     <string name="wait_service_connect">等待服务连接</string>
     <string name="click_close_notify">点击关闭通知</string>
     <string name="history_list">历史记录</string>
+    <string name="history_null_tip">暂无历史记录</string>
 </resources>
