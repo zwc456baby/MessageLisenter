@@ -32,7 +32,7 @@ public class HistoryActivity extends Activity {
      */
     private void showList() {
         ListView historyListView = findViewById(R.id.historyListView);
-        ArrayList<MessageBean> list = Utils.stringToMap(PreUtils.get(this, Constant.KEY_HISTORY_LIST, ""));
+        ArrayList<MessageBean> list = Utils.getMsgHistory(this);
         if (list.size() == 0) {
             TextView nullTip = findViewById(R.id.historyNullTipTv);
             historyListView.setVisibility(View.GONE);

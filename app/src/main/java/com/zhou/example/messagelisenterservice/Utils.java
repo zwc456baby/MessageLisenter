@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -117,17 +118,26 @@ class Utils {
     }
 
     static void addMsgToHistory(Context context, MessageBean messageBean) {
-        ArrayList<MessageBean> list = stringToMap(PreUtils.get(context, Constant.KEY_HISTORY_LIST, ""));
-        if (list.size() >= 20) {
-            while (list.size() >= 20) {
+        SharedPreferences preferences = context.getSharedPreferences("history_list_preference"
+                , Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        ArrayList<MessageBean> list = stringToMap(preferences.getString(Constant.KEY_HISTORY_LIST, ""));
+        if (list.size() >= 100) {
+            while (list.size() >= 100) {
                 list.remove(list.size() - 1);
             }
         }
         list.add(0, messageBean);
-        PreUtils.put(context, Constant.KEY_HISTORY_LIST, mapToString(list));
+        editor.putString(Constant.KEY_HISTORY_LIST, mapToString(list)).apply();
     }
 
-    static String mapToString(ArrayList<MessageBean> list) {
+    static ArrayList<MessageBean> getMsgHistory(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("history_list_preference"
+                , Context.MODE_PRIVATE);
+        return stringToMap(preferences.getString(Constant.KEY_HISTORY_LIST, ""));
+    }
+
+    private static String mapToString(ArrayList<MessageBean> list) {
         JSONArray jsonArray = new JSONArray();
         for (MessageBean entry : list) {
             JSONObject itemJson = new JSONObject();
@@ -143,7 +153,7 @@ class Utils {
         return jsonArray.toString();
     }
 
-    static ArrayList<MessageBean> stringToMap(String string) {
+    private static ArrayList<MessageBean> stringToMap(String string) {
         ArrayList<MessageBean> list = new ArrayList<>();
         if (!TextUtils.isEmpty(string)) {
             try {
