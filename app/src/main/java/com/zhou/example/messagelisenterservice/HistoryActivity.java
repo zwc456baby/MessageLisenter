@@ -100,14 +100,14 @@ public class HistoryActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         handler.removeCallbacks(finishRunnable);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         handler.postDelayed(finishRunnable, 60 * 1000);
     }
 
