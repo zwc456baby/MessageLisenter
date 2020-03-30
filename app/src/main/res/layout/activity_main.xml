@@ -187,7 +187,7 @@
             android:id="@+id/createShortcut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_shortcut"
+            android:text="@string/create_history_shortcut"
             android:textColor="#000" />
 
     </LinearLayout>
