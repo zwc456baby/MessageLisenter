@@ -177,7 +177,7 @@ public class SettingActivity extends Activity {
 
     private void createShortcut() {
         Intent shortcutIntent = new Intent();
-        shortcutIntent.setComponent(new ComponentName(this, SettingActivity.class));
+        shortcutIntent.setComponent(new ComponentName(this, HistoryActivity.class));
         //给Intent添加 对应的flag
         shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_NEW_TASK);
         Intent resultIntent = new Intent();
@@ -199,7 +199,7 @@ public class SettingActivity extends Activity {
         ShortcutManager shortcutManager = (ShortcutManager) getSystemService(Context.SHORTCUT_SERVICE);
         if (shortcutManager == null) return;
         if (shortcutManager.isRequestPinShortcutSupported()) {
-            Intent shortcutInfoIntent = new Intent(this, SettingActivity.class);
+            Intent shortcutInfoIntent = new Intent(this, HistoryActivity.class);
             shortcutInfoIntent.setAction(Intent.ACTION_VIEW); //action必须设置，不然报错
 
             ShortcutInfo info = new ShortcutInfo.Builder(this, getString(R.string.history_list))

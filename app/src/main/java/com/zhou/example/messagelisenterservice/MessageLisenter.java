@@ -31,11 +31,8 @@ import com.zhou.netlogutil.socket.SocketCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 /**
  * Created by user68 on 2018/7/30.
@@ -45,8 +42,6 @@ import java.util.Locale;
 public class MessageLisenter extends NotificationListenerService implements Handler.Callback {
     private final String TAG = "LogUtils";
 
-    private final String dayType = "yyyy-MM-dd HH:mm:ss";
-    private final DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
     private final ArrayList<MessageEnty> ntfMsgList = new ArrayList<>();
     // 暂存一下空的消息的包名和id
     private final ArrayList<MessageEnty> tmpNullMsgList = new ArrayList<>();
@@ -390,6 +385,11 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             int type = jsonObject.optInt("type", 0);
             String title = jsonObject.getString("title");
             String text = jsonObject.getString("text");
+            MessageBean messageBean = new MessageBean();
+            messageBean.setTime(System.currentTimeMillis());
+            messageBean.setTitle(title);
+            messageBean.setContext(text);
+            Utils.addMsgToHistory(this, messageBean);
             if (type > 0) {
                 Utils.sendNotifyMessage(this, title, text, type);
                 return;
@@ -508,7 +508,7 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         } else if (isEmptyMsg(notificationTitle, notificationText, subText))
             addNtfMessage(tmpNullMsgList, packageName, sbnId);
 
-        String time = dataFormat.format(Calendar.getInstance().getTime());
+        String time = Utils.formatTime(Calendar.getInstance().getTime());
 
         String writText = "\n" + "[" + time + "]" + "[" + packageName + "]" + "\n" +
                 "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +

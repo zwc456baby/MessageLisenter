@@ -39,6 +39,8 @@ public class Constant {
 
     public static final String START_SETTING_ACTIVITY_ACTION = "android.provider.Telephony.SECRET_CODE";
 
+    public static final String KEY_HISTORY_LIST = "key_history_list";
+
     public final static int KILL_SERVICE_TAG = 1;
 
 }

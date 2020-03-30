@@ -6,18 +6,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 class Utils {
 
-//    private static final File notifycationFilePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-
+    private final static String dayType = "yyyy-MM-dd HH:mm:ss";
 
     static void putStr(Context context, String value) {
         if (context == null) {
@@ -48,6 +57,11 @@ class Utils {
 
     private static boolean canWrite(File notifycationFilePath) {
         return notifycationFilePath.canWrite();
+    }
+
+    static String formatTime(Date time) {
+        DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
+        return dataFormat.format(time);
     }
 
     static void createNotificationChannel(Context context, String channelId, CharSequence channelName, int importance) {
@@ -88,7 +102,7 @@ class Utils {
                     .setShowWhen(true)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setPriority(Notification.PRIORITY_HIGH)
-                    .setAutoCancel(false);
+                    .setAutoCancel(true);
             int id = (channelId + String.valueOf(System.currentTimeMillis())).hashCode();
             String showTvText = String.format("%s\n%s", title, text);
             Intent intent = new Intent(context, LockShowActivity.class);
@@ -100,6 +114,52 @@ class Utils {
             // 正式发出通知
             manager.notify(id, notificationBuild.build());
         }
+    }
 
+    static void addMsgToHistory(Context context, MessageBean messageBean) {
+        ArrayList<MessageBean> list = stringToMap(PreUtils.get(context, Constant.KEY_HISTORY_LIST, ""));
+        if (list.size() >= 20) {
+            while (list.size() >= 20) {
+                list.remove(list.size() - 1);
+            }
+        }
+        list.add(0, messageBean);
+        PreUtils.put(context, Constant.KEY_HISTORY_LIST, mapToString(list));
+    }
+
+    static String mapToString(ArrayList<MessageBean> list) {
+        JSONArray jsonArray = new JSONArray();
+        for (MessageBean entry : list) {
+            JSONObject itemJson = new JSONObject();
+            try {
+                itemJson.put("time", entry.getTime());
+                itemJson.put("title", entry.getTitle());
+                itemJson.put("context", entry.getContext());
+                jsonArray.put(itemJson);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonArray.toString();
+    }
+
+    static ArrayList<MessageBean> stringToMap(String string) {
+        ArrayList<MessageBean> list = new ArrayList<>();
+        if (!TextUtils.isEmpty(string)) {
+            try {
+                JSONArray jsonArray = new JSONArray(string);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject itemJson = jsonArray.getJSONObject(i);
+                    MessageBean itemBean = new MessageBean();
+                    itemBean.setTime(itemJson.optLong("time"));
+                    itemBean.setTitle(itemJson.optString("title"));
+                    itemBean.setContext(itemJson.optString("context"));
+                    list.add(itemBean);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
     }
 }
