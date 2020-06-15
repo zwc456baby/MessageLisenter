@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -28,6 +29,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 class Utils {
 
     private final static String dayType = "yyyy-MM-dd HH:mm:ss";
+    private static int notifyDay = -1;
 
     static void putStr(Context context, String value) {
         if (context == null) {
@@ -38,6 +40,22 @@ class Utils {
 
         String notifycationFileName = "notifycation_file.txt";
         File file = new File(notifycationFilePath, notifycationFileName);
+        // 为了防止文件无限增大，只保留当天的数据
+        if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) != notifyDay) {
+            if (file.exists() && file.canWrite()) {
+                FileUtils fileUtils = new FileUtils();
+                if (fileUtils.deleteFileSafely(file)) {
+                    try {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            notifyDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        }
+
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new FileWriter(file, true), 1024);

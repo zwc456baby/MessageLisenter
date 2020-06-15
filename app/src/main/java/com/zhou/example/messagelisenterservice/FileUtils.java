@@ -65,7 +65,6 @@ public class FileUtils {
     /**
      * @param file 要删除的文件
      */
-
     protected boolean deleteFileSafely(File file) {
         if (file != null && file.exists()) {
             File tmp = getTmpFile(file, System.currentTimeMillis(), -1);
