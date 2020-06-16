@@ -25,7 +25,7 @@ public class SettingActivity extends Activity {
 
     private EditText appNameEdit, titleInEdit, messageInEdit, playSleepTime, pauseNotifyEdit, netLogUrlEdit, accountEdit, filenameEdit;
 
-    private Button startBtn, startSettingBtn, createShortcut;
+    private Button startBtn, startSettingBtn, createShortcut, batteryWhiteList;
 
     private CheckBox playMusic, zhengDong, containsService, pauseNotifyCheck, pauseApplyToAllPageCheck;
 
@@ -36,7 +36,6 @@ public class SettingActivity extends Activity {
         findView();
         setViewData();
         setViewLisenter();
-        checkBettryWhiteList();
     }
 
     private void findView() {
@@ -52,6 +51,7 @@ public class SettingActivity extends Activity {
         startBtn = findViewById(R.id.startBtn);
         startSettingBtn = findViewById(R.id.startSettingBtn);
         createShortcut = findViewById(R.id.createShortcut);
+        batteryWhiteList = findViewById(R.id.batteryWhiteList);
 
         playMusic = findViewById(R.id.playMusicCheck);
         zhengDong = findViewById(R.id.zhendongCheck);
@@ -105,21 +105,42 @@ public class SettingActivity extends Activity {
                 }
             }
         });
+        batteryWhiteList.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                gotoBattrySetting();
+            }
+        });
     }
 
-    private void checkBettryWhiteList() {
+    private void setBatteryBtnText() {
+        boolean isBattryWhite = checkBattryWhiteList();
+        batteryWhiteList.setText(isBattryWhite
+                ? getString(R.string.is_battery_white_list) : getString(R.string.battery_white_list));
+        // 电池优化白名单按钮根据状态设置是否可点击
+        batteryWhiteList.setClickable(!isBattryWhite);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            batteryWhiteList.setTextColor(isBattryWhite ? getColor(R.color.dark_grey) : getColor(R.color.black));
+        }
+    }
+
+    private boolean checkBattryWhiteList() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            if (powerManager == null) return;
-            if (!powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
-                //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
-                @SuppressLint("BatteryLife")
-                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-            }
+            if (powerManager == null) return true;
+            return powerManager.isIgnoringBatteryOptimizations(getPackageName());
         }
+        return true;
+    }
 
+    private void gotoBattrySetting() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            @SuppressLint("BatteryLife")
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        }
     }
 
     private void startRemoteService() {
@@ -220,6 +241,12 @@ public class SettingActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         finishAndRemoveTask();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setBatteryBtnText();
     }
 
     @Override

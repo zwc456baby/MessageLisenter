@@ -190,6 +190,13 @@
             android:text="@string/create_history_shortcut"
             android:textColor="#000" />
 
+        <Button
+            android:id="@+id/batteryWhiteList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/battery_white_list"
+            android:textColor="#000" />
+
     </LinearLayout>
     <!--</ScrollView>-->
 </ScrollView>

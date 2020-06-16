@@ -35,4 +35,6 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <color name="black">#000</color>
+    <color name="dark_grey">#696969</color>
 </resources>

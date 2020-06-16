@@ -14,6 +14,8 @@
     <string name="apply_setting">应用配置</string>
     <string name="start_setting">打开设置</string>
     <string name="create_history_shortcut">创建历史记录快捷方式</string>
+    <string name="battery_white_list">加入电池优化白名单</string>
+    <string name="is_battery_white_list">已在电池优化白名单</string>
     <string name="play_music">声音:</string>
     <string name="zheng_dong">震动:</string>
     <string name="contains_service">包括服务</string>
