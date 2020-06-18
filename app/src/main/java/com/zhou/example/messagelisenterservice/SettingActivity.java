@@ -244,8 +244,8 @@ public class SettingActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         setBatteryBtnText();
     }
 
