@@ -1,5 +1,6 @@
 package com.zhou.example.messagelisenterservice;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,6 +8,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -25,6 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.content.Context.POWER_SERVICE;
 
 class Utils {
 
@@ -78,6 +83,25 @@ class Utils {
         return notifycationFilePath.canWrite();
     }
 
+
+    static boolean checkBatteryWhiteList(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
+            if (powerManager == null) return true;
+            return powerManager.isIgnoringBatteryOptimizations(context.getPackageName());
+        }
+        return true;
+    }
+
+    static void gotoBatterySetting(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            @SuppressLint("BatteryLife")
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+        }
+    }
+
     static String formatTime(Date time) {
         DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
         return dataFormat.format(time);
@@ -101,38 +125,73 @@ class Utils {
 
     static void sendNotifyMessage(Context context, String title, String text, int type) {
         if (type == 1) {
-            NotificationManager manager = (NotificationManager) context.
-                    getSystemService(NOTIFICATION_SERVICE);
-            if (manager == null) return;
             String channelId = "MessageNotify";
-            Notification.Builder notificationBuild;
-
+            int channelLevel = -1;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                Utils.createNotificationChannel(context, channelId
-                        , "remote message notify"
-                        , NotificationManager.IMPORTANCE_HIGH);
-                notificationBuild = new Notification.Builder(context, channelId);
-            } else {
-                notificationBuild = new Notification.Builder(context);
+                channelLevel = NotificationManager.IMPORTANCE_HIGH;
             }
-            notificationBuild.setContentTitle(title)
-                    .setContentText(text)
-                    .setWhen(System.currentTimeMillis())
-                    .setShowWhen(true)
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setPriority(Notification.PRIORITY_HIGH)
-                    .setAutoCancel(true);
-            int id = (channelId + String.valueOf(System.currentTimeMillis())).hashCode();
+            int id = (channelId + System.currentTimeMillis()).hashCode();
             String showTvText = String.format("%s\n%s", title, text);
             Intent intent = new Intent(context, LockShowActivity.class);
             intent.putExtra(Constant.GET_MESSAGE_KEY, showTvText);
             intent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, type);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, id
-                    , intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            notificationBuild.setContentIntent(pendingIntent);
-            // 正式发出通知
-            manager.notify(id, notificationBuild.build());
+
+            sendNotify(context, channelId, "remote message notify",
+                    channelLevel, Notification.PRIORITY_HIGH, id,
+                    title, text, intent);
         }
+    }
+
+    static void sendBatteryNotify(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            String channelId = "BatteryNotify";
+            int channelLevel = -1;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                channelLevel = NotificationManager.IMPORTANCE_MAX;
+            }
+            @SuppressLint("BatteryLife")
+            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+            int id = (channelId + System.currentTimeMillis()).hashCode();
+            sendNotify(context, channelId, "battery white list notify",
+                    channelLevel, Notification.PRIORITY_MAX, id,
+                    context.getString(R.string.app_name), context.getString(R.string.click_add_to_battery_white_list),
+                    intent);
+        }
+    }
+
+    private static void sendNotify(Context context, String channelId, String channelName,
+                                   int channelLevel, int priority, int id,
+                                   String title, String text, Intent intent) {
+        NotificationManager manager = (NotificationManager) context.
+                getSystemService(NOTIFICATION_SERVICE);
+        if (manager == null) return;
+        Notification.Builder notificationBuild;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (channelLevel < 0) {
+                channelLevel = NotificationManager.IMPORTANCE_HIGH;
+            }
+            Utils.createNotificationChannel(context, channelId
+                    , channelName
+                    , channelLevel);
+            notificationBuild = new Notification.Builder(context, channelId);
+        } else {
+            notificationBuild = new Notification.Builder(context);
+        }
+        notificationBuild.setContentTitle(title)
+                .setContentText(text)
+                .setWhen(System.currentTimeMillis())
+                .setShowWhen(true)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setPriority(priority)
+                .setAutoCancel(true);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, id
+                , intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuild.setContentIntent(pendingIntent);
+        // 正式发出通知
+        manager.notify(id, notificationBuild.build());
     }
 
     static void addMsgToHistory(Context context, MessageBean messageBean) {

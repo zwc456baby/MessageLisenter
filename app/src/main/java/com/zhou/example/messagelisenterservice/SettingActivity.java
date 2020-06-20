@@ -1,6 +1,5 @@
 package com.zhou.example.messagelisenterservice;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -10,10 +9,8 @@ import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
@@ -109,37 +106,19 @@ public class SettingActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                gotoBattrySetting();
+                Utils.gotoBatterySetting(SettingActivity.this);
             }
         });
     }
 
     private void setBatteryBtnText() {
-        boolean isBattryWhite = checkBattryWhiteList();
+        boolean isBattryWhite = Utils.checkBatteryWhiteList(this);
         batteryWhiteList.setText(isBattryWhite
                 ? getString(R.string.is_battery_white_list) : getString(R.string.battery_white_list));
         // 电池优化白名单按钮根据状态设置是否可点击
         batteryWhiteList.setClickable(!isBattryWhite);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             batteryWhiteList.setTextColor(isBattryWhite ? getColor(R.color.dark_grey) : getColor(R.color.black));
-        }
-    }
-
-    private boolean checkBattryWhiteList() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            if (powerManager == null) return true;
-            return powerManager.isIgnoringBatteryOptimizations(getPackageName());
-        }
-        return true;
-    }
-
-    private void gotoBattrySetting() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            @SuppressLint("BatteryLife")
-            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + getPackageName()));
-            startActivity(intent);
         }
     }
 
@@ -158,7 +137,7 @@ public class SettingActivity extends Activity {
         intent.putExtra(Constant.FILENAME_KEY, filenameEdit.getText().toString());
 
         intent.putExtra(Constant.PLAY_SLEEP_TIME_KEY, playSleepTime.getText().toString());
-        intent.putExtra(Constant.PAUSE_NOTIFY_TIME_KEY, Long.valueOf(pauseNotifyEdit.getText().toString()) * 60 * 1000);
+        intent.putExtra(Constant.PAUSE_NOTIFY_TIME_KEY, Long.parseLong(pauseNotifyEdit.getText().toString()) * 60 * 1000);
 
         intent.putExtra(Constant.PLAY_MUSIC_KEY, playMusic.isChecked());
         intent.putExtra(Constant.PLAY_ZHENGDONG_KEY, zhengDong.isChecked());
