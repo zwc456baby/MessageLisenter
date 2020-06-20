@@ -74,7 +74,8 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         InitPlay();
         registerHomeBroad();
         reloadConfig();
-        if (!Utils.checkBatteryWhiteList(this)) {
+        if (!StartReceive.isBootCompleted
+                && !Utils.checkBatteryWhiteList(this)) {
             Utils.sendBatteryNotify(this);
         }
     }

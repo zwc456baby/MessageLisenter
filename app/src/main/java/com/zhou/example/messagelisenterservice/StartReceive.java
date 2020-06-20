@@ -14,10 +14,14 @@ import android.content.pm.PackageManager;
 
 public class StartReceive extends BroadcastReceiver {
     public static final String TRY_CLOSE_ACTIVITY_ACTION = "try_close_activity_action";
+    static boolean isBootCompleted = false; // 标志是否已经开机发送过通知
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            isBootCompleted = true;
+            Utils.sendBatteryNotify(context);
+        }
         if (Constant.START_SETTING_ACTIVITY_ACTION.equals(intent.getAction())) {
             Intent startActivityIntent = new Intent(context, SettingActivity.class);
             startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

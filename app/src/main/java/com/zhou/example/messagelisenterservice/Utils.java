@@ -151,8 +151,8 @@ class Utils {
             }
             @SuppressLint("BatteryLife")
             Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setData(Uri.parse("package:" + context.getPackageName()));
-            context.startActivity(intent);
             int id = (channelId + System.currentTimeMillis()).hashCode();
             sendNotify(context, channelId, "battery white list notify",
                     channelLevel, Notification.PRIORITY_MAX, id,
