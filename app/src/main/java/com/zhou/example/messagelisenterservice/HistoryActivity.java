@@ -57,7 +57,7 @@ public class HistoryActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            MessageBean messageBean = list.get(position);
+            final MessageBean messageBean = list.get(position);
             ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = LayoutInflater.from(context).inflate(resourceId, null);
@@ -67,15 +67,20 @@ public class HistoryActivity extends Activity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            final String showText = String.format("%s\n%s\n%s"
+            // 一个是去除前后回车符的，一个是未去除回车符的
+            String showText = String.format("%s\n%s\n%s"
                     , Utils.formatTime(new Date(messageBean.getTime()))
                     , messageBean.getTitle()
-                    , messageBean.getContext());
+                    , messageBean.getContext().replace('\n', ' '));
             viewHolder.textView.setText(showText);
             viewHolder.textView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
+                    String showText = String.format("%s\n%s\n%s"
+                            , Utils.formatTime(new Date(messageBean.getTime()))
+                            , messageBean.getTitle()
+                            , messageBean.getContext());
                     Intent intent = new Intent(context, LockShowActivity.class);
                     intent.putExtra(Constant.GET_MESSAGE_KEY, showText);
                     intent.putExtra(LockShowActivity.GET_SHOW_ACTIVITY_TYPE, -2);
