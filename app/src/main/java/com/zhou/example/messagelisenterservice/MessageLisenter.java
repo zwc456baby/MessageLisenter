@@ -341,10 +341,12 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     private void startLockActivity() {
         if (startLockActivity) {
             Intent intent = new Intent(this, LockShowActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra(Constant.GET_MESSAGE_KEY, getShowMessage());
             startActivity(intent);
-        } else
+        } else {
             updataMessageData();
+        }
     }
 
     private void finishLockActivity(int type) {
