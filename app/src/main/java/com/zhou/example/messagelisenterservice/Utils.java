@@ -182,6 +182,9 @@ class Utils {
         }
         notificationBuild.setContentTitle(title)
                 .setContentText(text)
+                .setStyle(new Notification.BigTextStyle()
+                        .setBigContentTitle(title)
+                        .bigText(text))
                 .setWhen(System.currentTimeMillis())
                 .setShowWhen(true)
                 .setSmallIcon(R.drawable.ic_launcher)
