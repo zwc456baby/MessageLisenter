@@ -55,11 +55,11 @@ public class PushSocket {
 
     private boolean send(String tag, String msg) {
         if (isExit()) return false;
-        if (TextUtils.isEmpty(tag)) {
-            tag = "title";
+        if (tag == null) {
+            tag = "";
         }
-        if (TextUtils.isEmpty(msg)) {
-            msg = "message";
+        if (msg == null) {
+            msg = "";
         }
         try {
             return sendMessage(buildUrl(logConfig.getUrl()
