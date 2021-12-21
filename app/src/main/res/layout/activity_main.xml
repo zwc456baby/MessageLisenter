@@ -139,21 +139,25 @@
 
         <TextView
             style="@style/setting_edit_text"
-            android:text="@string/account" />
+            android:text="@string/account"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/accountEdit"
             style="@style/setting_edit"
-            android:hint="@string/account_hint" />
+            android:hint="@string/account_hint"
+            android:visibility="gone" />
 
         <TextView
             style="@style/setting_edit_text"
-            android:text="@string/filename_tip" />
+            android:text="@string/filename_tip"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/filenameEdit"
             style="@style/setting_edit"
-            android:hint="@string/filename" />
+            android:hint="@string/filename"
+            android:visibility="gone" />
 
         <RelativeLayout
             android:layout_width="match_parent"

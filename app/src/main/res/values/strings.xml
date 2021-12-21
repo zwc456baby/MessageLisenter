@@ -22,12 +22,12 @@
     <string name="contains_service">包括服务</string>
     <string name="pause_notify_time">关闭后是否暂停通知</string>
     <string name="pause_notify_time_hint">关闭后暂停通知的时间(单位:分钟)</string>
-    <string name="net_log_url">请输入websocket Url</string>
+    <string name="net_log_url">请输入Notify Url</string>
     <string name="net_log_url_hint">url</string>
-    <string name="account">请输入账户</string>
-    <string name="account_hint">账户</string>
-    <string name="filename_tip">请输入文件名</string>
-    <string name="filename">文件名</string>
+    <string name="account">请输入Title Key</string>
+    <string name="account_hint">Title Key</string>
+    <string name="filename_tip">请输入Message Key</string>
+    <string name="filename">Message Key</string>
     <string name="pause_notify_page_text">暂停通知对所有页面生效</string>
     <string name="wait_service_connect">等待服务连接</string>
     <string name="click_close_notify">点击关闭通知</string>

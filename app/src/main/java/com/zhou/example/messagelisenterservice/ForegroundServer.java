@@ -84,7 +84,7 @@ public class ForegroundServer extends Service {
         }
 
         Utils.createNotificationChannel(this, CHANNEL_ID, channel_name
-                , NotificationManager.IMPORTANCE_HIGH);
+                , NotificationManager.IMPORTANCE_DEFAULT);
         Notification notification = getNotifycation(null);
 
         startForeground(FOREGROUND_ID, notification);

@@ -160,7 +160,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         Intent startActivityIntent = new Intent(this, ForegroundActivity.class);
         startActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startActivityIntent);
-
     }
 
     private void exitForeground() {
@@ -196,20 +195,19 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             return;
         }
         NetLogConfig config = NetLogUtil.buildConfig();
-        config.configAccount(configEntry.getAccount());
-        config.configFileName(TextUtils.isEmpty(configEntry.getFilename()) ?
-                "notifycation.log" : configEntry.getFilename());
+        config.configTitleKey(TextUtils.isEmpty(configEntry.getAccount()) ? "title" : configEntry.getAccount());
+        config.configMessageKey(TextUtils.isEmpty(configEntry.getFilename()) ?
+                "message" : configEntry.getFilename());
         config.configUrl(configEntry.getNetLogUrl());
         config.configMinReconnectTime(5000);
         config.configConnectTimeout(5000);
         config.configReconnectTime(10000);
-        config.configCrypto(true);
-        config.configCustomizePing(true);
+        config.configMaxPoolSize(100);
         config.configSocketCallback(new SocketCallback() {
             boolean isForeground = false;
 
             @Override
-            public void onConnect() {
+            public void onSend() {
                 if (isForeground) {
                     isForeground = false;
                     exitForeground();
@@ -234,11 +232,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                     reconnectCount = 0;
                     enterForeground();
                 }
-            }
-
-            @Override
-            public void onMessage(String s) {
-                sendOtherMessageData(s);
             }
         });
         NetLogUtil.connect(this, config);
@@ -494,6 +487,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void writeNotifyToFile(StatusBarNotification sbn) {
+        if (!config.isCancelable() && !sbn.isClearable())
+            return;
+
         Log.i(TAG, "write notify message to file");
         //            具有写入权限，否则不写入
         CharSequence notificationTitle = null;
@@ -525,7 +521,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         //如果不位于前台，则添加到列表中
         //如果处于前台，则直接清空队列并上传
         if (!TextUtils.isEmpty(config.getNetLogUrl())) {
-            NetLogUtil.log(writText);
+            NetLogUtil.log(packageName, "[" + time + "]" + "\n" + "[" + notificationTitle + "]"
+                    + "\n" + "[" + notificationText + "]" + "\n" +
+                    "[" + subText + "]" + "\n");
         }
     }
 
