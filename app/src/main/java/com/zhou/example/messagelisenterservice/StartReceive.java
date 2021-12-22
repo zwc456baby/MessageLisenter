@@ -19,8 +19,10 @@ public class StartReceive extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            isBootCompleted = true;
-            Utils.sendBatteryNotify(context);
+            if (!Utils.checkBatteryWhiteList(context)) {
+                isBootCompleted = true;
+                Utils.sendBatteryNotify(context);
+            }
         }
         if (Constant.START_SETTING_ACTIVITY_ACTION.equals(intent.getAction())) {
             Intent startActivityIntent = new Intent(context, SettingActivity.class);
