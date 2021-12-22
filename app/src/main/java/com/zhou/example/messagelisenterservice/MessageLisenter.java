@@ -488,9 +488,6 @@ public class MessageLisenter extends NotificationListenerService implements Hand
     }
 
     private void writeNotifyToFile(StatusBarNotification sbn) {
-        if (!config.isCancelable() && !sbn.isClearable())
-            return;
-
         Log.i(TAG, "write notify message to file");
         //            具有写入权限，否则不写入
         CharSequence notificationTitle = null;
@@ -521,6 +518,10 @@ public class MessageLisenter extends NotificationListenerService implements Hand
         ThreadUtils.workPost(() -> {
             Utils.putStr(MessageLisenter.this, writText);
         });
+
+        // 推送通知遵循配置选项
+        if (!config.isCancelable() && !sbn.isClearable())
+            return;
 
         //如果不位于前台，则添加到列表中
         //如果处于前台，则直接清空队列并上传
