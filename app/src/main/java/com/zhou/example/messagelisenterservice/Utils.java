@@ -34,6 +34,7 @@ import static android.content.Context.POWER_SERVICE;
 class Utils {
 
     private final static String dayType = "yyyy-MM-dd HH:mm:ss";
+    private final static String hourType = "HH:mm:ss";
     private static int notifyDay = -1;
 
     static void putStr(Context context, String value) {
@@ -104,6 +105,11 @@ class Utils {
 
     static String formatTime(Date time) {
         DateFormat dataFormat = new SimpleDateFormat(dayType, Locale.getDefault());
+        return dataFormat.format(time);
+    }
+
+    static String formatTimeSimple(Date time) {
+        DateFormat dataFormat = new SimpleDateFormat(hourType, Locale.getDefault());
         return dataFormat.format(time);
     }
 

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.zhou.netlogutil.NetLogUtil;
 import com.zhou.netlogutil.handler.NetLogConfig;
 import com.zhou.netlogutil.socket.SocketCallback;
+import com.zhou.netlogutil.socket.ThreadUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -516,14 +517,21 @@ public class MessageLisenter extends NotificationListenerService implements Hand
                 "[" + notificationTitle + "]" + "\n" + "[" + notificationText + "]" + "\n" +
                 "[" + subText + "]" + "\n";
 
-        Utils.putStr(MessageLisenter.this, writText);
+        // 使用 post 异步的写入
+        ThreadUtils.workPost(() -> {
+            Utils.putStr(MessageLisenter.this, writText);
+        });
 
         //如果不位于前台，则添加到列表中
         //如果处于前台，则直接清空队列并上传
         if (!TextUtils.isEmpty(config.getNetLogUrl())) {
-            NetLogUtil.log(packageName, "[" + time + "]" + "\n" + "[" + notificationTitle + "]"
-                    + "\n" + "[" + notificationText + "]" + "\n" +
-                    "[" + subText + "]" + "\n");
+            String simpleTime = Utils.formatTimeSimple(Calendar.getInstance().getTime());
+            String notifyStr = "[" + notificationTitle + "]" + "[" + simpleTime + "]"
+                    + "\n" + "[" + notificationText + "]";
+            if (subText != null) {
+                notifyStr += "\n" + "[" + subText + "]";
+            }
+            NetLogUtil.log(packageName, notifyStr);
         }
     }
 
