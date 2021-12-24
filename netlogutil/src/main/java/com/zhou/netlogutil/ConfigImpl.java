@@ -6,8 +6,6 @@ import com.zhou.netlogutil.socket.SocketCallback;
 class ConfigImpl implements NetLogConfig {
 
     private String url;
-    private String titleKey;
-    private String messageKey;
     private long reconnectTime = 70000;
     private long minReconnectTime = 5000;
     private int maxPoolSize = 10000;
@@ -19,18 +17,6 @@ class ConfigImpl implements NetLogConfig {
     @Override
     public NetLogConfig configUrl(String url) {
         this.url = url;
-        return this;
-    }
-
-    @Override
-    public NetLogConfig configTitleKey(String account) {
-        this.titleKey = account;
-        return this;
-    }
-
-    @Override
-    public NetLogConfig configMessageKey(String fileName) {
-        this.messageKey = fileName;
         return this;
     }
 
@@ -91,16 +77,6 @@ class ConfigImpl implements NetLogConfig {
     @Override
     public String getUrl() {
         return url;
-    }
-
-    @Override
-    public String getTitleKey() {
-        return titleKey;
-    }
-
-    @Override
-    public String getMessageKey() {
-        return messageKey;
     }
 
     @Override

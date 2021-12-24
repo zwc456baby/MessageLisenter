@@ -196,9 +196,9 @@ public class MessageLisenter extends NotificationListenerService implements Hand
             return;
         }
         NetLogConfig config = NetLogUtil.buildConfig();
-        config.configTitleKey(TextUtils.isEmpty(configEntry.getAccount()) ? "title" : configEntry.getAccount());
-        config.configMessageKey(TextUtils.isEmpty(configEntry.getFilename()) ?
-                "message" : configEntry.getFilename());
+//        config.configTitleKey(TextUtils.isEmpty(configEntry.getAccount()) ? "title" : configEntry.getAccount());
+//        config.configMessageKey(TextUtils.isEmpty(configEntry.getFilename()) ?
+//                "message" : configEntry.getFilename());
         config.configUrl(configEntry.getNetLogUrl());
         config.configMinReconnectTime(5000);
         config.configConnectTimeout(5000);

@@ -5,10 +5,6 @@ import com.zhou.netlogutil.socket.SocketCallback;
 public interface NetLogConfig {
     NetLogConfig configUrl(String url);
 
-    NetLogConfig configTitleKey(String account);
-
-    NetLogConfig configMessageKey(String fileName);
-
     NetLogConfig configReconnectTime(long time);
 
     NetLogConfig configMaxPoolSize(int poolSize);
@@ -22,10 +18,6 @@ public interface NetLogConfig {
     NetLogConfig configSocketCallback(SocketCallback callback);
 
     String getUrl();
-
-    String getTitleKey();
-
-    String getMessageKey();
 
     long getReconnectTime();
 
