@@ -1,7 +1,6 @@
 package com.zhou.netlogutil.socket;
 
 import android.os.SystemClock;
-import android.text.TextUtils;
 
 import com.zhou.netlogutil.LogData;
 import com.zhou.netlogutil.handler.ILogQueue;
@@ -50,7 +49,7 @@ public class PushSocket {
         }
         System.out.println("web socket exit");
         exit = true;
-        ThreadUtils.removeExecute(flashRunnable);
+        ThreadUtils.removeWork(flashRunnable);
     }
 
     private boolean send(String tag, String msg) {
@@ -124,21 +123,21 @@ public class PushSocket {
     }
 
     private void autoReconnect(long tempDelay) {
-        ThreadUtils.removeExecute(flashRunnable);
+        ThreadUtils.removeWork(flashRunnable);
         if (isExit()) {
             return;
         }
         if (logHandler.isflush() && tempDelay >= 0) { // 如果当前正在刷新数据
             tempDelay = -1;
         }
-        ThreadUtils.executeDelayed(() -> {
+        ThreadUtils.workPostDelay(() -> {
             SocketCallback socketCallback = logConfig == null ?
                     null : logConfig.getSocketCallback();
             if (socketCallback != null) {  // 调用重连
                 socketCallback.onReconnect();
             }
         }, tempDelay);
-        ThreadUtils.executeDelayed(flashRunnable, tempDelay);
+        ThreadUtils.workPostDelay(flashRunnable, tempDelay);
     }
 
     private boolean isExit() {
