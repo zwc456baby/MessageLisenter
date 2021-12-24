@@ -167,11 +167,13 @@ public class PushSocket {
 
             // 开始进行刷新
             if (logHandler.isflush()) { // 如果正处于flush阶段，则不再发送心跳,若处于open 状态，直接发送
-                while (!isExit() && (logQueue.getQuereSize() > 0 || logQueue.resetQuereSize() > 0)) {
+                while (!isExit() && logHandler.isflush()
+                        && (logQueue.getQuereSize() > 0 || logQueue.resetQuereSize() > 0)) {
                     if (!pushLineLog()) {
                         logQueue.remove();  // push 失败也要依旧移除首条消息
                     }
                 }
+                logHandler.clearQuere();
                 logHandler.cancelFlush();
             } else {
                 //取出数据并发送
