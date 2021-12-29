@@ -8,10 +8,10 @@ import com.zhou.netlogutil.handler.LogHandler;
 import com.zhou.netlogutil.handler.NetLogConfig;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -47,7 +47,6 @@ public class PushSocket {
         if (isExit()) {
             return;
         }
-        System.out.println("web socket exit");
         exit = true;
         ThreadUtils.removeWork(flashRunnable);
     }
@@ -77,27 +76,54 @@ public class PushSocket {
     }
 
     private boolean sendMessage(String urlStr) {
+        HttpURLConnection connection = null;
+        InputStream in = null;
+        OutputStream out = null;
         try {
             URL url = new URL(urlStr);
             //得到connection对象。
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(logConfig.getConnectTimeout());
             connection.setReadTimeout(logConfig.getConnectTimeout());
             //设置请求方式
             connection.setRequestMethod("GET");
             //连接
             connection.connect();
+
+            try {
+                in = connection.getInputStream();
+            } catch (IOException ignored) {
+            }
+            try {
+                out = connection.getOutputStream();
+            } catch (IOException ignored) {
+            }
             //得到响应码
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return true;
             }
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
+            if (connection != null) {
+                try {
+                    connection.disconnect();
+                } catch (Exception ignore) {
+                }
+            }
+        } finally {
+            // 正确的关闭链接，否则文件描述符溢出
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception ignore) {
+                }
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception ignore) {
+                }
+            }
         }
         return false;
     }
